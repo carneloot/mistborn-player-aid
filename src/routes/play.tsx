@@ -4,12 +4,10 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 
 import { styles } from '../app.styles';
 import {
 	baselineTraining,
-	boxingCost,
 	boxingsFromTurnCoins,
 	paymentFor,
 } from '../domain/session';
@@ -30,7 +28,11 @@ function PlayPage() {
 		(player) => player.id === session.activePlayerId,
 	);
 	const active = session.players[activeIndex];
-	const nextTurn = (direction: 1 | -1) =>
+	const availableToSpend = session.scratchpad.coins + active.boxings;
+	const minimumPurchaseCost = availableToSpend === 0 ? 0 : 1;
+	const selectedPurchaseCost = Math.min(purchaseCost, availableToSpend);
+	const nextTurn = (direction: 1 | -1) => {
+		if (direction === -1 && session.completedTurns === 0) return;
 		change((current) => {
 			const index = current.players.findIndex(
 				(player) => player.id === current.activePlayerId,
@@ -62,6 +64,7 @@ function PlayPage() {
 				},
 			};
 		});
+	};
 	const adjustScratch = (
 		key: 'coins' | 'combat' | 'missionPoints',
 		amount: number,
@@ -73,7 +76,7 @@ function PlayPage() {
 				[key]: Math.max(0, current.scratchpad[key] + amount),
 			},
 		}));
-	const spend = (cost: number, addBoxing = false) =>
+	const spend = (cost: number) =>
 		change((current) => {
 			const player = current.players.find(
 				(item) => item.id === current.activePlayerId,
@@ -83,7 +86,6 @@ function PlayPage() {
 				current.scratchpad.coins,
 				player.boxings,
 				cost,
-				!addBoxing,
 			);
 			if (receipt.remainingUnpaid > 0) return current;
 			const payment = `Paid ${receipt.paidTurnCoins} turn coin${receipt.paidTurnCoins === 1 ? '' : 's'}${receipt.paidBoxings ? ` + ${receipt.paidBoxings} Boxing${receipt.paidBoxings === 1 ? '' : 's'}` : ''}.`;
@@ -98,8 +100,7 @@ function PlayPage() {
 					item.id === player.id
 						? {
 								...item,
-								boxings:
-									item.boxings - receipt.paidBoxings + (addBoxing ? 1 : 0),
+								boxings: item.boxings - receipt.paidBoxings,
 							}
 						: item,
 				),
@@ -113,13 +114,7 @@ function PlayPage() {
 		navigate({ to: '/' });
 	};
 	return (
-		<main
-			{...stylex.props(
-				styles.app,
-				styles.play,
-				session.preferences.dim && styles.dim,
-			)}
-		>
+		<main {...stylex.props(styles.app, styles.play)}>
 			<header {...stylex.props(styles.turnStrip)}>
 				<div>
 					<p {...stylex.props(styles.eyebrow)}>ROUND {session.round}</p>
@@ -149,6 +144,7 @@ function PlayPage() {
 					<Button
 						className={stylex.props(styles.turnButton).className}
 						variant="outline"
+						disabled={session.completedTurns === 0}
 						onClick={() => nextTurn(-1)}
 					>
 						Previous turn
@@ -195,6 +191,41 @@ function PlayPage() {
 					</Button>
 				</div>
 			)}
+			<Card className={stylex.props(styles.appCard, styles.coins).className}>
+				<h2 {...stylex.props(styles.headingTwo)}>Coins</h2>
+				<p {...stylex.props(styles.muted)}>Total available to spend</p>
+				<output
+					{...stylex.props(styles.coinTotal)}
+					aria-label={`Total available to spend: ${availableToSpend}`}
+				>
+					{availableToSpend}
+				</output>
+				<Counter
+					label="Purchase cost"
+					value={selectedPurchaseCost}
+					min={minimumPurchaseCost}
+					max={availableToSpend}
+					change={(amount) =>
+						setPurchaseCost(
+							Math.max(
+								minimumPurchaseCost,
+								Math.min(availableToSpend, selectedPurchaseCost + amount),
+							),
+						)
+					}
+				/>
+				<Button
+					disabled={selectedPurchaseCost === 0}
+					onClick={() => spend(selectedPurchaseCost)}
+				>
+					Buy
+				</Button>
+				{session.scratchpad.lastPayment && (
+					<p {...stylex.props(styles.paragraph)}>
+						{session.scratchpad.lastPayment}
+					</p>
+				)}
+			</Card>
 			<Card
 				className={stylex.props(styles.appCard, styles.scratchpad).className}
 			>
@@ -214,98 +245,40 @@ function PlayPage() {
 					value={session.scratchpad.missionPoints}
 					change={(amount) => adjustScratch('missionPoints', amount)}
 				/>
-				<div {...stylex.props(styles.spend)}>
-					<label {...stylex.props(styles.spendLabel)}>
-						Purchase cost
-						<Input
-							className={stylex.props(styles.purchaseInput).className}
-							type="number"
-							min="1"
-							value={purchaseCost}
-							onChange={(event) =>
-								setPurchaseCost(Math.max(1, Number(event.target.value) || 1))
-							}
-						/>
-					</label>
-					<Button variant="secondary" onClick={() => spend(purchaseCost)}>
-						Pay cost
-					</Button>
-					<Button onClick={() => spend(boxingCost, true)}>
-						Buy Boxing · {boxingCost}
-					</Button>
-				</div>
-				{session.scratchpad.lastPayment && (
-					<p {...stylex.props(styles.paragraph)}>
-						{session.scratchpad.lastPayment}
-					</p>
-				)}
 			</Card>
 			<Card className={stylex.props(styles.appCard, styles.boxing).className}>
-				<h2 {...stylex.props(styles.boxingTitle)}>Boxings</h2>
-				<p {...stylex.props(styles.muted)}>
-					Unlimited resource · persists between turns
-				</p>
+				<h2 {...stylex.props(styles.headingTwo)}>Boxings</h2>
 				{session.players.map((player) => (
-					<div {...stylex.props(styles.boxingRow)} key={player.id}>
-						<span {...stylex.props(styles.marker, styles[player.color])}>
-							{player.symbol}
-						</span>
-						<strong>{player.name}</strong>
-						<Button
-							variant="outline"
-							size="icon-lg"
-							aria-label={`Remove one Boxing from ${player.name}`}
-							onClick={() =>
-								change((current) => ({
-									...current,
-									players: current.players.map((item) =>
-										item.id === player.id
-											? { ...item, boxings: Math.max(0, item.boxings - 1) }
-											: item,
-									),
-								}))
-							}
-						>
-							−
-						</Button>
-						<output {...stylex.props(styles.counterOutput)}>
-							{player.boxings}
-						</output>
-						<Button
-							variant="outline"
-							size="icon-lg"
-							aria-label={`Add one Boxing to ${player.name}`}
-							onClick={() =>
-								change((current) => ({
-									...current,
-									players: current.players.map((item) =>
-										item.id === player.id
-											? { ...item, boxings: item.boxings + 1 }
-											: item,
-									),
-								}))
-							}
-						>
-							+
-						</Button>
-					</div>
+					<Counter
+						accessibleLabel={`${player.name} Boxings`}
+						change={(amount) =>
+							change((current) => ({
+								...current,
+								players: current.players.map((item) =>
+									item.id === player.id
+										? {
+												...item,
+												boxings: Math.max(0, item.boxings + amount),
+											}
+										: item,
+								),
+							}))
+						}
+						key={player.id}
+						label={
+							<span {...stylex.props(styles.playerCounterLabel)}>
+								<span {...stylex.props(styles.marker, styles[player.color])}>
+									{player.symbol}
+								</span>
+								{player.name}
+							</span>
+						}
+						value={player.boxings}
+					/>
 				))}
 			</Card>
 			<Card className={stylex.props(styles.appCard, styles.training).className}>
-				<div {...stylex.props(styles.sectionHeading)}>
-					<h2 {...stylex.props(styles.headingTwo)}>Training baseline</h2>
-					<Button
-						variant="ghost"
-						onClick={() =>
-							change((current) => ({
-								...current,
-								preferences: { dim: !current.preferences.dim },
-							}))
-						}
-					>
-						{session.preferences.dim ? 'Brighten' : 'Dim table'}
-					</Button>
-				</div>
+				<h2 {...stylex.props(styles.headingTwo)}>Training baseline</h2>
 				<div
 					{...stylex.props(styles.trainingTrack)}
 					aria-label={`Training baseline position ${trainingPosition} of ${trackLength}`}
@@ -329,7 +302,7 @@ function PlayPage() {
 						</div>
 					))}
 				</div>
-				<p {...stylex.props(styles.paragraph)}>
+				<p {...stylex.props(styles.trainingDescription)}>
 					<strong>Baseline — no extra Train effects.</strong> Your physical
 					Training cube is authoritative.
 				</p>
@@ -340,20 +313,29 @@ function PlayPage() {
 
 function Counter({
 	label,
+	accessibleLabel,
 	value,
 	change,
+	min = 0,
+	max = Number.POSITIVE_INFINITY,
 }: {
-	label: string;
+	label: React.ReactNode;
+	accessibleLabel?: string;
 	value: number;
 	change: (amount: number) => void;
+	min?: number;
+	max?: number;
 }) {
+	const counterLabel =
+		accessibleLabel ?? (typeof label === 'string' ? label : 'value');
 	return (
 		<div {...stylex.props(styles.counter)}>
 			<span>{label}</span>
 			<Button
 				variant="outline"
 				size="icon-lg"
-				aria-label={`Decrease ${label}`}
+				aria-label={`Decrease ${counterLabel}`}
+				disabled={value <= min}
 				onClick={() => change(-1)}
 			>
 				−
@@ -362,7 +344,8 @@ function Counter({
 			<Button
 				variant="outline"
 				size="icon-lg"
-				aria-label={`Increase ${label}`}
+				aria-label={`Increase ${counterLabel}`}
+				disabled={value >= max}
 				onClick={() => change(1)}
 			>
 				+

@@ -21,11 +21,11 @@ const styles = stylex.create({
 		color: colors.cardForeground,
 		display: 'flex',
 		flexDirection: 'column',
-		gap: 'var(--card-spacing, 1.5rem)',
-		paddingBottom: 'var(--card-spacing, 1.5rem)',
-		paddingTop: 'var(--card-spacing, 1.5rem)',
+		gap: 'var(--card-spacing, 1rem)',
+		paddingBottom: 'var(--card-spacing, 1rem)',
+		paddingTop: 'var(--card-spacing, 1rem)',
 	},
-	content: { paddingInline: 'var(--card-spacing, 1.5rem)' },
+	content: { paddingInline: 'var(--card-spacing, 1rem)' },
 	description: {
 		color: colors.mutedForeground,
 		fontSize: '0.875rem',
@@ -34,7 +34,7 @@ const styles = stylex.create({
 	footer: {
 		alignItems: 'center',
 		display: 'flex',
-		paddingInline: 'var(--card-spacing, 1.5rem)',
+		paddingInline: 'var(--card-spacing, 1rem)',
 	},
 	header: {
 		alignItems: 'start',
@@ -42,7 +42,7 @@ const styles = stylex.create({
 		gap: '0.375rem',
 		gridTemplateColumns: '1fr auto',
 		gridTemplateRows: 'auto auto',
-		paddingInline: 'var(--card-spacing, 1.5rem)',
+		paddingInline: 'var(--card-spacing, 1rem)',
 	},
 	title: { fontWeight: 600, letterSpacing: '-0.025em', lineHeight: 1 },
 });

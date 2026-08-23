@@ -29,7 +29,6 @@ export const SessionSchema = Schema.Struct({
 	completedTurns: Schema.Number,
 	missions: Schema.Array(Schema.String),
 	scratchpad: ScratchpadSchema,
-	preferences: Schema.Struct({ dim: Schema.Boolean }),
 });
 
 export const PersistedSessionSchema = Schema.NullOr(SessionSchema);
@@ -70,26 +69,18 @@ export const createSession = (
 		missionPoints: 0,
 		lastPayment: null,
 	},
-	preferences: { dim: false },
 });
 
 export const baselineTraining = (session: Session): number =>
 	Math.floor(session.completedTurns / session.players.length) + 1;
 
-export const boxingCost = 2;
-
 export const boxingsFromTurnCoins = (coins: number): number =>
-	Math.floor(coins / boxingCost);
+	Math.floor(coins / 2);
 
-export const paymentFor = (
-	coins: number,
-	boxings: number,
-	cost: number,
-	useBoxings = true,
-) => {
+export const paymentFor = (coins: number, boxings: number, cost: number) => {
 	const paidTurnCoins = Math.min(coins, cost);
 	const remaining = cost - paidTurnCoins;
-	const paidBoxings = useBoxings ? Math.min(boxings, remaining) : 0;
+	const paidBoxings = Math.min(boxings, remaining);
 	return {
 		paidTurnCoins,
 		paidBoxings,
