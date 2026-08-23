@@ -4,7 +4,8 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 
-command -v node >/dev/null
-command -v npm >/dev/null
+mise_bin="$(command -v mise || printf '%s' "$HOME/.local/bin/mise")"
+test -x "$mise_bin"
+"$mise_bin" exec -- bun --version >/dev/null
 test -d node_modules
 printf 'Mistborn Player Aid environment is ready.\n'

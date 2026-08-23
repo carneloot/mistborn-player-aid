@@ -14,10 +14,10 @@ After authenticating Alchemy with the Cloudflare account that owns the
 `carneloot.com` zone, deploy with:
 
 ```sh
-npm run deploy
+bun run deploy
 ```
 
-Use `npm run dev:cloudflare` for Alchemy's Cloudflare-backed development mode.
+Use `bun run dev:cloudflare` for Alchemy's Cloudflare-backed development mode.
 
 ## License
 

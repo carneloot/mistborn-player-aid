@@ -8,13 +8,17 @@ step() {
   printf '\n==> %s\n' "$1"
 }
 
-step "Checking Node.js and npm"
-command -v node >/dev/null
-command -v npm >/dev/null
-node -e 'const [major, minor] = process.versions.node.split(".").map(Number); if (major < 20 || (major === 20 && minor < 19)) process.exit(1)' \
-  || { echo "Node.js 20.19 or newer is required." >&2; exit 1; }
-node --version
-npm --version
+step "Installing mise"
+if command -v mise >/dev/null; then
+  mise_bin="$(command -v mise)"
+else
+  curl -fsSL https://mise.run | sh
+  mise_bin="$HOME/.local/bin/mise"
+fi
 
-step "Installing locked npm dependencies"
-npm ci --no-audit --no-fund
+step "Installing the configured Bun version"
+"$mise_bin" install
+"$mise_bin" exec -- bun --version
+
+step "Installing locked Bun dependencies"
+"$mise_bin" exec -- bun install --frozen-lockfile
