@@ -16,6 +16,10 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: production
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      WORKER_HOST: mistborn.carneloot.com
     steps:
       - uses: actions/checkout@v4
 
@@ -25,7 +29,49 @@ jobs:
 
       - run: bun install --frozen-lockfile
 
-      - run: bun run deploy -- --stage prod --yes
-        env:
-          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      - name: Deploy, verify, and roll back on failure
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          api_url="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}"
+          api_headers=(
+            --header "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}"
+            --header 'Content-Type: application/json'
+          )
+
+          domain=$(curl --fail-with-body --silent --show-error --get \
+            --data-urlencode "hostname=${WORKER_HOST}" \
+            "${api_headers[@]}" \
+            "${api_url}/workers/domains")
+          worker_name=$(jq -er --arg hostname "${WORKER_HOST}" \
+            '.result | map(select(.hostname == $hostname)) | .[0].service' <<<"${domain}")
+          worker_name_url=$(jq -rn --arg value "${worker_name}" '$value | @uri')
+
+          curl --fail-with-body --silent --show-error "${api_headers[@]}" \
+            "${api_url}/workers/scripts/${worker_name_url}/deployments" \
+            | jq -ec '.result.deployments[0] | {strategy, versions}' \
+            > "${RUNNER_TEMP}/previous-deployment.json"
+
+          bun run deploy -- --stage prod --yes
+
+          for attempt in {1..30}; do
+            status=$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' \
+              --header 'Cache-Control: no-cache' \
+              --max-time 10 "https://${WORKER_HOST}" || true)
+            if [[ "${status}" =~ ^2 ]]; then
+              echo "Worker is healthy (HTTP ${status})."
+              exit 0
+            fi
+
+            echo "Worker health check ${attempt}/30 returned HTTP ${status}; retrying in 10 seconds."
+            sleep 10
+          done
+
+          echo "Worker did not become healthy; restoring the previous deployment."
+          curl --fail-with-body --silent --show-error --request POST \
+            "${api_headers[@]}" \
+            --data @"${RUNNER_TEMP}/previous-deployment.json" \
+            "${api_url}/workers/scripts/${worker_name_url}/deployments"
+          echo "Rollback completed."
+          exit 1
