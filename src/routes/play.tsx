@@ -4,7 +4,6 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 
 import { styles } from '../app.styles';
@@ -16,13 +15,6 @@ import {
 } from '../domain/session';
 import { useSession } from '../hooks/use-session';
 import { ThemeToggle } from './__root';
-
-const checklist = [
-	'Advance the physical Training cube one space.',
-	'Play cards, Burn or Flare metals, use abilities, buy, and attack in any legal order.',
-	'Resolve Target movement after all damage is assigned, if applicable.',
-	'Discard non-Allies and unplayed cards, then draw five cards.',
-];
 
 function PlayPage() {
 	const { session, change, undoLast, canUndo, setSession, setUndo } =
@@ -66,7 +58,6 @@ function PlayPage() {
 					coins: 0,
 					combat: 0,
 					missionPoints: 0,
-					acknowledged: [],
 					lastPayment: null,
 				},
 			};
@@ -121,16 +112,6 @@ function PlayPage() {
 		setUndo([]);
 		navigate({ to: '/' });
 	};
-	const toggleAcknowledged = (item: string) =>
-		change((current) => ({
-			...current,
-			scratchpad: {
-				...current.scratchpad,
-				acknowledged: current.scratchpad.acknowledged.includes(item)
-					? current.scratchpad.acknowledged.filter((entry) => entry !== item)
-					: [...current.scratchpad.acknowledged, item],
-			},
-		}));
 	return (
 		<main
 			{...stylex.props(
@@ -162,6 +143,9 @@ function PlayPage() {
 				</div>
 				<div {...stylex.props(styles.turnControls)}>
 					<ThemeToggle />
+					<Button variant="ghost" disabled={!canUndo} onClick={undoLast}>
+						Undo
+					</Button>
 					<Button
 						className={stylex.props(styles.turnButton).className}
 						variant="outline"
@@ -211,24 +195,6 @@ function PlayPage() {
 					</Button>
 				</div>
 			)}
-			<Card className={stylex.props(styles.appCard, styles.turnAid).className}>
-				<div {...stylex.props(styles.sectionHeading)}>
-					<h2 {...stylex.props(styles.headingTwo)}>Turn aid</h2>
-					<Button variant="ghost" disabled={!canUndo} onClick={undoLast}>
-						Undo
-					</Button>
-				</div>
-				{checklist.map((item, index) => (
-					<div {...stylex.props(styles.check)} key={item}>
-						<Checkbox
-							id={`turn-check-${index}`}
-							checked={session.scratchpad.acknowledged.includes(item)}
-							onCheckedChange={() => toggleAcknowledged(item)}
-						/>
-						<label htmlFor={`turn-check-${index}`}>{item}</label>
-					</div>
-				))}
-			</Card>
 			<Card
 				className={stylex.props(styles.appCard, styles.scratchpad).className}
 			>

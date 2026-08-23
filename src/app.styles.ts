@@ -175,13 +175,12 @@ export const styles = stylex.create({
 		width: { default: 'auto', [mobile]: '100%' },
 	},
 	turnButton: { flexGrow: { default: 0, [mobile]: 1 } },
-	turnAid: { gridRow: { default: '2 / 4', [mobile]: 'auto' } },
 	scratchpad: {
 		alignContent: 'start',
+		gridColumn: { default: '1 / 3', [mobile]: 'auto' },
+		gridRow: { default: '2', [mobile]: 'auto' },
 		display: 'grid',
 		gap: '0.55rem',
-		gridColumn: { default: '2', [mobile]: 'auto' },
-		gridRow: { default: '2', [mobile]: 'auto' },
 	},
 	boxing: {
 		alignContent: 'start',
@@ -198,15 +197,6 @@ export const styles = stylex.create({
 		display: 'flex',
 		gap: '0.75rem',
 		justifyContent: 'space-between',
-	},
-	check: {
-		alignItems: 'flex-start',
-		borderTop: `1px solid ${colors.checkBorder}`,
-		display: 'flex',
-		gap: '0.65rem',
-		lineHeight: 1.35,
-		paddingBottom: '0.8rem',
-		paddingTop: '0.8rem',
 	},
 	counter: {
 		alignItems: 'center',

@@ -16,7 +16,6 @@ const ScratchpadSchema = Schema.Struct({
 	coins: Schema.Number,
 	combat: Schema.Number,
 	missionPoints: Schema.Number,
-	acknowledged: Schema.Array(Schema.String),
 	lastPayment: Schema.NullOr(Schema.String),
 });
 
@@ -69,7 +68,6 @@ export const createSession = (
 		coins: 0,
 		combat: 0,
 		missionPoints: 0,
-		acknowledged: [],
 		lastPayment: null,
 	},
 	preferences: { dim: false },
