@@ -15,6 +15,7 @@ import {
 	paymentFor,
 } from '../domain/session';
 import { useSession } from '../hooks/use-session';
+import { ThemeToggle } from './__root';
 
 const checklist = [
 	'Advance the physical Training cube one space.',
@@ -160,6 +161,7 @@ function PlayPage() {
 					))}
 				</div>
 				<div {...stylex.props(styles.turnControls)}>
+					<ThemeToggle />
 					<Button
 						className={stylex.props(styles.turnButton).className}
 						variant="outline"

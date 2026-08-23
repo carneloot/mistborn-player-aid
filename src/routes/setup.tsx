@@ -19,6 +19,7 @@ import {
 	type PlayerColor,
 } from '../domain/session';
 import { useSession } from '../hooks/use-session';
+import { ThemeToggle } from './__root';
 
 const shuffle = <T,>(values: readonly T[]) =>
 	[...values].sort(() => Math.random() - 0.5);
@@ -71,9 +72,12 @@ function SetupPage() {
 		return (
 			<main {...stylex.props(styles.app, styles.setup)}>
 				<header {...stylex.props(styles.setupHeader)}>
-					<Link to="/" {...stylex.props(styles.link)}>
-						Mistborn Player Aid
-					</Link>
+					<div {...stylex.props(styles.setupUtility)}>
+						<Link to="/" {...stylex.props(styles.link)}>
+							Mistborn Player Aid
+						</Link>
+						<ThemeToggle />
+					</div>
 					<h1 {...stylex.props(styles.heading, styles.setupHeading)}>
 						Start a game
 					</h1>
@@ -125,9 +129,12 @@ function SetupPage() {
 	return (
 		<main {...stylex.props(styles.app, styles.setup)}>
 			<header {...stylex.props(styles.setupHeader)}>
-				<Link to="/" {...stylex.props(styles.link)}>
-					Mistborn Player Aid
-				</Link>
+				<div {...stylex.props(styles.setupUtility)}>
+					<Link to="/" {...stylex.props(styles.link)}>
+						Mistborn Player Aid
+					</Link>
+					<ThemeToggle />
+				</div>
 				<h1 {...stylex.props(styles.heading, styles.setupHeading)}>
 					Set the table
 				</h1>

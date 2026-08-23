@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card';
 
 import { styles } from '../app.styles';
 import { useSession } from '../hooks/use-session';
+import { ThemeToggle } from './__root';
 
 function LaunchPage() {
 	const { session, setSession, setUndo } = useSession();
@@ -16,7 +17,10 @@ function LaunchPage() {
 		navigate({ to: session?.setupComplete ? '/play' : '/setup' });
 	return (
 		<main {...stylex.props(styles.app, styles.launch)}>
-			<p {...stylex.props(styles.eyebrow)}>LOCAL-FIRST TABLE COMPANION</p>
+			<div {...stylex.props(styles.launchUtility)}>
+				<p {...stylex.props(styles.eyebrow)}>LOCAL-FIRST TABLE COMPANION</p>
+				<ThemeToggle />
+			</div>
 			<h1 {...stylex.props(styles.heading)}>
 				Mistborn
 				<br />

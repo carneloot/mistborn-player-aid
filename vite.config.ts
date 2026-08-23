@@ -21,7 +21,7 @@ export default defineConfig({
 		alias: { '@': new URL('./src', import.meta.url).pathname },
 	},
 	server: {
-		allowedHosts: ['t-03gqdm7gbyb6d4prr0ifleomw-p29957.onamp.dev'],
+		allowedHosts: ['.onamp.dev'],
 	},
 	test: {
 		environment: 'jsdom',
