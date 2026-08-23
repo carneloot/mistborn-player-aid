@@ -6,6 +6,19 @@ It supports physical play rather than replacing it: the app provides setup rando
 
 See [the MVP specification](MISTBORN_PLAYER_AID_SPEC.md) for the complete product scope, exclusions, and acceptance criteria.
 
+## Deployment
+
+The app deploys as a Cloudflare Worker with static assets at
+`https://mistborn.carneloot.com` through [Alchemy v2](alchemy.run.ts).
+After authenticating Alchemy with the Cloudflare account that owns the
+`carneloot.com` zone, deploy with:
+
+```sh
+npm run deploy
+```
+
+Use `npm run dev:cloudflare` for Alchemy's Cloudflare-backed development mode.
+
 ## License
 
 [MIT](LICENSE)
