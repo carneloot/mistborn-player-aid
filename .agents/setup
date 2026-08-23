@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$repo_root"
+
+step() {
+  printf '\n==> %s\n' "$1"
+}
+
+step "Checking Node.js and npm"
+command -v node >/dev/null
+command -v npm >/dev/null
+node -e 'const [major, minor] = process.versions.node.split(".").map(Number); if (major < 20 || (major === 20 && minor < 19)) process.exit(1)' \
+  || { echo "Node.js 20.19 or newer is required." >&2; exit 1; }
+node --version
+npm --version
+
+step "Installing locked npm dependencies"
+npm ci --no-audit --no-fund
