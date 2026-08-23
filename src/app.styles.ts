@@ -47,15 +47,14 @@ export const styles = stylex.create({
 		maxWidth: '44rem',
 	},
 	finePrint: {
-		color: '#c0c7b7',
+		color: colors.lede,
 		fontSize: '0.85rem',
 		marginTop: 0,
 	},
 	launch: {
 		alignContent: 'center',
 		backgroundColor: colors.background,
-		backgroundImage:
-			`radial-gradient(ellipse at 78% 28%, ${colors.launchGlow} 0, transparent 27%), radial-gradient(ellipse at 96% 80%, ${colors.launchGlow} 0, transparent 30%)`,
+		backgroundImage: `radial-gradient(ellipse at 78% 28%, ${colors.launchGlow} 0, transparent 27%), radial-gradient(ellipse at 96% 80%, ${colors.launchGlow} 0, transparent 30%)`,
 		display: 'grid',
 		gap: '1.5rem',
 		justifyItems: 'start',
