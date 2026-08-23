@@ -14,6 +14,7 @@
     "noFallthroughCasesInSwitch": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "paths": { "@/*": ["./src/*"] },
     "allowImportingTsExtensions": false,
     "verbatimModuleSyntax": true,
     "jsx": "react-jsx",

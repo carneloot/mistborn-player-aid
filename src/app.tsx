@@ -1,6 +1,7 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react"
 import { Link, Outlet, useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
+import { Button } from "@/components/ui/button"
 import {
   baselineTraining,
   characters,
@@ -60,7 +61,7 @@ export function LaunchPage() {
         <section className="card saved-game">
           <strong>Saved game on this iPad</strong>
           <span>{session.players.map((player) => player.name).join(" · ")}</span>
-          <button className="primary" onClick={resume}>Resume game</button>
+          <Button size="lg" onClick={resume}>Resume game</Button>
           {confirmingReset ? (
             <div className="confirm"><span>Delete this local game?</span><button onClick={() => { setSession(null); setUndo([]) }}>Reset game</button><button onClick={() => setConfirmingReset(false)}>Keep it</button></div>
           ) : <button className="quiet" onClick={() => setConfirmingReset(true)}>Reset saved game</button>}
