@@ -1,24 +1,34 @@
-import { describe, expect, it } from "vitest"
-import { baselineTraining, createSession, paymentFor } from "./session"
+import { describe, expect, it } from 'vitest';
 
-const session = () => createSession([
-  { name: "Ari", color: "ember", symbol: "◆" },
-  { name: "Bea", color: "cobalt", symbol: "●" },
-])
+import { baselineTraining, createSession, paymentFor } from './session';
 
-describe("paymentFor", () => {
-  it("uses turn coins before Boxings", () => {
-    expect(paymentFor(4, 3, 5)).toEqual({ paidTurnCoins: 4, paidBoxings: 1, remainingUnpaid: 0 })
-  })
+const session = () =>
+	createSession([
+		{ name: 'Ari', color: 'ember', symbol: '◆' },
+		{ name: 'Bea', color: 'cobalt', symbol: '●' },
+	]);
 
-  it("reports an unaffordable remainder", () => {
-    expect(paymentFor(1, 1, 4)).toEqual({ paidTurnCoins: 1, paidBoxings: 1, remainingUnpaid: 2 })
-  })
-})
+describe('paymentFor', () => {
+	it('uses turn coins before Boxings', () => {
+		expect(paymentFor(4, 3, 5)).toEqual({
+			paidTurnCoins: 4,
+			paidBoxings: 1,
+			remainingUnpaid: 0,
+		});
+	});
 
-describe("baselineTraining", () => {
-  it("includes the current player's start-of-turn advance", () => {
-    expect(baselineTraining(session())).toBe(1)
-    expect(baselineTraining({ ...session(), completedTurns: 2 })).toBe(2)
-  })
-})
+	it('reports an unaffordable remainder', () => {
+		expect(paymentFor(1, 1, 4)).toEqual({
+			paidTurnCoins: 1,
+			paidBoxings: 1,
+			remainingUnpaid: 2,
+		});
+	});
+});
+
+describe('baselineTraining', () => {
+	it("includes the current player's start-of-turn advance", () => {
+		expect(baselineTraining(session())).toBe(1);
+		expect(baselineTraining({ ...session(), completedTurns: 2 })).toBe(2);
+	});
+});

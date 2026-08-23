@@ -1,0 +1,35 @@
+{
+	"$schema": "./node_modules/oxfmt/configuration_schema.json",
+	"semi": true,
+	"useTabs": true,
+	"tabWidth": 2,
+	"singleQuote": true,
+	"trailingComma": "all",
+	"arrowParens": "always",
+	"printWidth": 80,
+	"experimentalSortImports": {
+		"order": "asc",
+		"ignoreCase": true,
+		"newlinesBetween": true,
+		"internalPattern": ["@/"],
+		"groups": [
+			["builtin", "external"],
+			"internal",
+			["parent", "sibling", "index"],
+			"unknown"
+		]
+	},
+	"ignorePatterns": [
+		"node_modules/**",
+		"dist/**",
+		"build/**",
+		".react-router/**",
+		"*.lock",
+		".env*",
+		"src/routeTree.gen.ts",
+		".specs/**",
+		"docs/**",
+		"AGENTS.md",
+		".lalph/**"
+	]
+}

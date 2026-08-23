@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Provide a single-iPad, local-first table companion for the competitive mode of *Mistborn: The Deckbuilding Game*. The app reduces rulebook lookups, helps a group remember turn timing, and tracks unlimited Boxing tokens.
+Provide a single-iPad, local-first table companion for the competitive mode of _Mistborn: The Deckbuilding Game_. The app reduces rulebook lookups, helps a group remember turn timing, and tracks unlimited Boxing tokens.
 
 It is deliberately **not** a digital implementation of the game. Physical cards, dials, tokens, tracks, and standees remain the source of truth.
 
@@ -113,7 +113,7 @@ The app includes a searchable, table-readable reference with short answers and c
 - Two-player combat rules.
 - Three–four-player Target rules, including passing after health damage and removing Target when only two players remain.
 - Market purchases, coins expiring at end of turn, and Boxings.
-- The three competitive end-game conditions: complete all three Missions, be the last player alive, or play four Atium on *Confrontation*.
+- The three competitive end-game conditions: complete all three Missions, be the last player alive, or play four Atium on _Confrontation_.
 
 Relevant references should adapt to player count. For example, the Target explanation is displayed only for a three- or four-player game.
 
