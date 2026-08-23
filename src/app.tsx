@@ -1,7 +1,13 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react"
+import * as stylex from "@stylexjs/stylex"
 import { Link, Outlet, useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
+import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
+import { styles } from "./app.styles"
 import {
   baselineTraining,
   characters,
@@ -44,7 +50,7 @@ function useSession() {
 }
 
 export function RootLayout() {
-  return <Outlet />
+  return <div {...stylex.props(styles.root)}><Outlet /></div>
 }
 
 export function LaunchPage() {
@@ -53,21 +59,21 @@ export function LaunchPage() {
   const navigate = useNavigate()
   const resume = () => navigate({ to: session?.setupComplete ? "/play" : "/setup" })
   return (
-    <main className="launch">
-      <p className="eyebrow">LOCAL-FIRST TABLE COMPANION</p>
-      <h1>Mistborn<br />Player Aid</h1>
-      <p className="lede">A shared iPad aid for competitive play. Physical components always remain authoritative.</p>
+    <main {...stylex.props(styles.app, styles.launch)}>
+      <p {...stylex.props(styles.eyebrow)}>LOCAL-FIRST TABLE COMPANION</p>
+      <h1 {...stylex.props(styles.heading)}>Mistborn<br />Player Aid</h1>
+      <p {...stylex.props(styles.lede)}>A shared iPad aid for competitive play. Physical components always remain authoritative.</p>
       {session ? (
-        <section className="card saved-game">
+        <Card className={stylex.props(styles.appCard, styles.savedGame).className}>
           <strong>Saved game on this iPad</strong>
           <span>{session.players.map((player) => player.name).join(" · ")}</span>
           <Button size="lg" onClick={resume}>Resume game</Button>
           {confirmingReset ? (
-            <div className="confirm"><span>Delete this local game?</span><button onClick={() => { setSession(null); setUndo([]) }}>Reset game</button><button onClick={() => setConfirmingReset(false)}>Keep it</button></div>
-          ) : <button className="quiet" onClick={() => setConfirmingReset(true)}>Reset saved game</button>}
-        </section>
-      ) : <Link className="primary link-button" to="/setup">New competitive game</Link>}
-      <p className="fine-print">Saved information stays only on this iPad.</p>
+            <div {...stylex.props(styles.confirm)}><span>Delete this local game?</span><Button variant="destructive" onClick={() => { setSession(null); setUndo([]) }}>Reset game</Button><Button variant="outline" onClick={() => setConfirmingReset(false)}>Keep it</Button></div>
+          ) : <Button variant="ghost" onClick={() => setConfirmingReset(true)}>Reset saved game</Button>}
+        </Card>
+      ) : <Button className={stylex.props(styles.launchAction).className} size="lg" render={<Link to="/setup" />}>New competitive game</Button>}
+      <p {...stylex.props(styles.finePrint)}>Saved information stays only on this iPad.</p>
     </main>
   )
 }
@@ -99,9 +105,44 @@ export function SetupPage() {
     change((current) => ({ ...current, setupComplete: true }))
     navigate({ to: "/play" })
   }
-  if (!draft) return <main className="setup"><header><Link to="/">Mistborn Player Aid</Link><h1>Start a game</h1></header><section className="card"><label>Players <select value={count} onChange={(event) => { const next = Number(event.target.value); setCount(next); setNames((current) => Array.from({ length: next }, (_, index) => current[index] ?? `Player ${index + 1}`)) }}><option value={2}>2</option><option value={3}>3</option><option value={4}>4</option></select></label>{Array.from({ length: count }, (_, index) => <label key={index}>Player {index + 1}<input value={names[index] ?? ""} maxLength={20} onChange={(event) => setNames((current) => current.map((name, nameIndex) => nameIndex === index ? event.target.value : name))} /></label>)}<button className="primary" onClick={initialize}>Continue to randomizers</button></section></main>
+  if (!draft) return (
+    <main {...stylex.props(styles.app, styles.setup)}>
+      <header {...stylex.props(styles.setupHeader)}><Link to="/" {...stylex.props(styles.link)}>Mistborn Player Aid</Link><h1 {...stylex.props(styles.heading, styles.setupHeading)}>Start a game</h1></header>
+      <Card className={stylex.props(styles.appCard).className}>
+        <label {...stylex.props(styles.fieldLabel)}>
+          Players
+          <NativeSelect value={count} onChange={(event) => { const next = Number(event.target.value); setCount(next); setNames((current) => Array.from({ length: next }, (_, index) => current[index] ?? `Player ${index + 1}`)) }}>
+            <NativeSelectOption value={2}>2</NativeSelectOption>
+            <NativeSelectOption value={3}>3</NativeSelectOption>
+            <NativeSelectOption value={4}>4</NativeSelectOption>
+          </NativeSelect>
+        </label>
+        {Array.from({ length: count }, (_, index) => (
+          <label key={index} {...stylex.props(styles.fieldLabel)}>
+            Player {index + 1}
+            <Input value={names[index] ?? ""} maxLength={20} onChange={(event) => setNames((current) => current.map((name, nameIndex) => nameIndex === index ? event.target.value : name))} />
+          </label>
+        ))}
+        <Button onClick={initialize}>Continue to randomizers</Button>
+      </Card>
+    </main>
+  )
   const first = draft.players.find((player) => player.id === draft.firstPlayerId)
-  return <main className="setup"><header><Link to="/">Mistborn Player Aid</Link><h1>Set the table</h1><p>Results are displayed before confirmation. Take all listed cards and components physically.</p></header><section className="setup-grid"><article className="card"><h2>1. First player</h2><p>{first ? <><strong>{first.name}</strong> goes first. Starting health: 36, then +2, +4{draft.players.length === 4 ? ", +4 and 1 Boxing" : ""}.</> : "Choose a random first player."}</p>{draft.players.length > 2 && first && <p>Target begins with {draft.players.at(-1)?.name}, last in turn order from first player.</p>}</article><article className="card"><h2>2. Characters</h2>{draft.players.map((player) => <p key={player.id}><strong>{player.name}</strong> — {player.character ?? "Not assigned"}</p>)}</article><article className="card"><h2>3. Missions</h2>{draft.missions.length ? <ol>{draft.missions.map((mission) => <li key={mission}>{mission}</li>)}</ol> : <p>Select three different Missions.</p>}</article></section><div className="setup-actions"><button className="primary" onClick={rollSetup}>{first ? "Reroll results" : "Randomize setup"}</button><button disabled={!first || draft.missions.length !== 3 || draft.players.some((player) => !player.character)} onClick={confirm}>Confirm setup & start play</button></div><section className="card reminders"><h2>Physical setup reminders</h2><p>Give each player their character Training cards, Funding cards, Training track/cube, eight metals, and health dial. Reveal six Market cards, place Mission cubes, and draw five cards.</p></section></main>
+  return (
+    <main {...stylex.props(styles.app, styles.setup)}>
+      <header {...stylex.props(styles.setupHeader)}><Link to="/" {...stylex.props(styles.link)}>Mistborn Player Aid</Link><h1 {...stylex.props(styles.heading, styles.setupHeading)}>Set the table</h1><p {...stylex.props(styles.paragraph)}>Results are displayed before confirmation. Take all listed cards and components physically.</p></header>
+      <section {...stylex.props(styles.setupGrid)}>
+        <Card className={stylex.props(styles.appCard).className}><h2 {...stylex.props(styles.headingTwo)}>1. First player</h2><p {...stylex.props(styles.paragraph)}>{first ? <><strong>{first.name}</strong> goes first. Starting health: 36, then +2, +4{draft.players.length === 4 ? ", +4 and 1 Boxing" : ""}.</> : "Choose a random first player."}</p>{draft.players.length > 2 && first && <p {...stylex.props(styles.paragraph)}>Target begins with {draft.players.at(-1)?.name}, last in turn order from first player.</p>}</Card>
+        <Card className={stylex.props(styles.appCard).className}><h2 {...stylex.props(styles.headingTwo)}>2. Characters</h2>{draft.players.map((player) => <p key={player.id} {...stylex.props(styles.paragraph)}><strong>{player.name}</strong> — {player.character ?? "Not assigned"}</p>)}</Card>
+        <Card className={stylex.props(styles.appCard).className}><h2 {...stylex.props(styles.headingTwo)}>3. Missions</h2>{draft.missions.length ? <ol {...stylex.props(styles.list)}>{draft.missions.map((mission) => <li key={mission}>{mission}</li>)}</ol> : <p {...stylex.props(styles.paragraph)}>Select three different Missions.</p>}</Card>
+      </section>
+      <div {...stylex.props(styles.setupActions)}>
+        <Button className={stylex.props(styles.setupAction).className} onClick={rollSetup}>{first ? "Reroll results" : "Randomize setup"}</Button>
+        <Button className={stylex.props(styles.setupAction).className} variant="secondary" disabled={!first || draft.missions.length !== 3 || draft.players.some((player) => !player.character)} onClick={confirm}>Confirm setup & start play</Button>
+      </div>
+      <Card className={stylex.props(styles.appCard, styles.reminders).className}><h2 {...stylex.props(styles.headingTwo)}>Physical setup reminders</h2><p {...stylex.props(styles.paragraph)}>Give each player their character Training cards, Funding cards, Training track/cube, eight metals, and health dial. Reveal six Market cards, place Mission cubes, and draw five cards.</p></Card>
+    </main>
+  )
 }
 
 export function PlayPage() {
@@ -130,9 +171,77 @@ export function PlayPage() {
   const trainingPosition = baselineTraining(session)
   const trackLength = Math.max(10, trainingPosition)
   const endGame = () => { setSession(null); setUndo([]); navigate({ to: "/" }) }
-  return <main className={`play ${session.preferences.dim ? "dim" : ""}`}><header className="turn-strip"><div><p className="eyebrow">ROUND {session.round}</p><h1>{active.name}'s turn</h1></div><div className="player-pills">{session.players.map((player) => <span className={player.id === active.id ? `pill active ${player.color}` : `pill ${player.color}`} key={player.id}>{player.symbol} {player.name}</span>)}</div><div className="turn-controls"><button onClick={() => nextTurn(-1)}>Previous turn</button><button className="primary" onClick={() => nextTurn(1)}>Next turn</button><button className="quiet" onClick={() => setConfirmingEnd(true)}>End game</button></div></header>{confirmingEnd && <div className="end-game-dialog" role="dialog" aria-modal="true" aria-label="End game confirmation"><strong>End this game?</strong><span>This deletes the saved session from this iPad.</span><button className="primary" onClick={endGame}>End and clear game</button><button onClick={() => setConfirmingEnd(false)}>Keep playing</button></div>}<section className="turn-aid card"><div className="section-heading"><h2>Turn aid</h2><button className="quiet" disabled={!canUndo} onClick={undoLast}>Undo</button></div>{checklist.map((item) => <label className="check" key={item}><input type="checkbox" checked={session.scratchpad.acknowledged.includes(item)} onChange={() => change((current) => ({ ...current, scratchpad: { ...current.scratchpad, acknowledged: current.scratchpad.acknowledged.includes(item) ? current.scratchpad.acknowledged.filter((entry) => entry !== item) : [...current.scratchpad.acknowledged, item] } }))} />{item}</label>)}</section><section className="scratchpad card"><h2>Turn scratchpad</h2><Counter label="Generated coins" value={session.scratchpad.coins} change={(amount) => adjustScratch("coins", amount)} /><Counter label="Combat" value={session.scratchpad.combat} change={(amount) => adjustScratch("combat", amount)} /><Counter label="Mission points" value={session.scratchpad.missionPoints} change={(amount) => adjustScratch("missionPoints", amount)} /><div className="spend"><label>Purchase cost<input type="number" min="1" value={purchaseCost} onChange={(event) => setPurchaseCost(Math.max(1, Number(event.target.value) || 1))} /></label><button onClick={() => spend(purchaseCost)}>Pay cost</button><button className="primary" onClick={() => spend(2, true)}>Buy Boxing · 2</button></div>{session.scratchpad.lastPayment && <p className="receipt">{session.scratchpad.lastPayment}</p>}</section><section className="boxing card"><h2>Boxings</h2><p className="muted">Unlimited resource · persists between turns</p>{session.players.map((player) => <div className="boxing-row" key={player.id}><span className={`marker ${player.color}`}>{player.symbol}</span><strong>{player.name}</strong><button onClick={() => change((current) => ({ ...current, players: current.players.map((item) => item.id === player.id ? { ...item, boxings: Math.max(0, item.boxings - 1) } : item) }))}>−</button><output>{player.boxings}</output><button onClick={() => change((current) => ({ ...current, players: current.players.map((item) => item.id === player.id ? { ...item, boxings: item.boxings + 1 } : item) }))}>+</button></div>)}</section><section className="training card"><div className="section-heading"><h2>Training baseline</h2><button className="quiet" onClick={() => change((current) => ({ ...current, preferences: { dim: !current.preferences.dim } }))}>{session.preferences.dim ? "Brighten" : "Dim table"}</button></div><div className="training-track" aria-label={`Training baseline position ${trainingPosition} of ${trackLength}`}>{Array.from({ length: trackLength }, (_, index) => <div className={index + 1 === trainingPosition ? "track-space current" : index + 1 < trainingPosition ? "track-space reached" : "track-space"} key={index}><span>{index + 1}</span>{index + 1 === trainingPosition && <strong>Baseline</strong>}</div>)}</div><p><strong>Baseline — no extra Train effects.</strong> Your physical Training cube is authoritative.</p></section></main>
+  const toggleAcknowledged = (item: string) => change((current) => ({
+    ...current,
+    scratchpad: {
+      ...current.scratchpad,
+      acknowledged: current.scratchpad.acknowledged.includes(item)
+        ? current.scratchpad.acknowledged.filter((entry) => entry !== item)
+        : [...current.scratchpad.acknowledged, item],
+    },
+  }))
+  return (
+    <main {...stylex.props(styles.app, styles.play, session.preferences.dim && styles.dim)}>
+      <header {...stylex.props(styles.turnStrip)}>
+        <div><p {...stylex.props(styles.eyebrow)}>ROUND {session.round}</p><h1 {...stylex.props(styles.turnHeading)}>{active.name}'s turn</h1></div>
+        <div {...stylex.props(styles.playerPills)}>{session.players.map((player) => <span {...stylex.props(styles.pill, player.id === active.id && styles.activePill, styles[player.color])} key={player.id}>{player.symbol} {player.name}</span>)}</div>
+        <div {...stylex.props(styles.turnControls)}>
+          <Button className={stylex.props(styles.turnButton).className} variant="outline" onClick={() => nextTurn(-1)}>Previous turn</Button>
+          <Button className={stylex.props(styles.turnButton).className} onClick={() => nextTurn(1)}>Next turn</Button>
+          <Button className={stylex.props(styles.turnButton).className} variant="ghost" onClick={() => setConfirmingEnd(true)}>End game</Button>
+        </div>
+      </header>
+      {confirmingEnd && (
+        <div {...stylex.props(styles.endGameDialog)} role="dialog" aria-modal="true" aria-label="End game confirmation">
+          <strong {...stylex.props(styles.dialogItem)}>End this game?</strong>
+          <span {...stylex.props(styles.dialogItem)}>This deletes the saved session from this iPad.</span>
+          <Button className={stylex.props(styles.dialogItem).className} variant="destructive" onClick={endGame}>End and clear game</Button>
+          <Button className={stylex.props(styles.dialogItem).className} variant="outline" onClick={() => setConfirmingEnd(false)}>Keep playing</Button>
+        </div>
+      )}
+      <Card className={stylex.props(styles.appCard, styles.turnAid).className}>
+        <div {...stylex.props(styles.sectionHeading)}><h2 {...stylex.props(styles.headingTwo)}>Turn aid</h2><Button variant="ghost" disabled={!canUndo} onClick={undoLast}>Undo</Button></div>
+        {checklist.map((item, index) => (
+          <div {...stylex.props(styles.check)} key={item}>
+            <Checkbox id={`turn-check-${index}`} checked={session.scratchpad.acknowledged.includes(item)} onCheckedChange={() => toggleAcknowledged(item)} />
+            <label htmlFor={`turn-check-${index}`}>{item}</label>
+          </div>
+        ))}
+      </Card>
+      <Card className={stylex.props(styles.appCard, styles.scratchpad).className}>
+        <h2 {...stylex.props(styles.headingTwo)}>Turn scratchpad</h2>
+        <Counter label="Generated coins" value={session.scratchpad.coins} change={(amount) => adjustScratch("coins", amount)} />
+        <Counter label="Combat" value={session.scratchpad.combat} change={(amount) => adjustScratch("combat", amount)} />
+        <Counter label="Mission points" value={session.scratchpad.missionPoints} change={(amount) => adjustScratch("missionPoints", amount)} />
+        <div {...stylex.props(styles.spend)}>
+          <label {...stylex.props(styles.spendLabel)}>Purchase cost<Input className={stylex.props(styles.purchaseInput).className} type="number" min="1" value={purchaseCost} onChange={(event) => setPurchaseCost(Math.max(1, Number(event.target.value) || 1))} /></label>
+          <Button variant="secondary" onClick={() => spend(purchaseCost)}>Pay cost</Button>
+          <Button onClick={() => spend(2, true)}>Buy Boxing · 2</Button>
+        </div>
+        {session.scratchpad.lastPayment && <p {...stylex.props(styles.paragraph)}>{session.scratchpad.lastPayment}</p>}
+      </Card>
+      <Card className={stylex.props(styles.appCard, styles.boxing).className}>
+        <h2 {...stylex.props(styles.boxingTitle)}>Boxings</h2>
+        <p {...stylex.props(styles.muted)}>Unlimited resource · persists between turns</p>
+        {session.players.map((player) => (
+          <div {...stylex.props(styles.boxingRow)} key={player.id}>
+            <span {...stylex.props(styles.marker, styles[player.color])}>{player.symbol}</span>
+            <strong>{player.name}</strong>
+            <Button variant="outline" size="icon-lg" aria-label={`Remove one Boxing from ${player.name}`} onClick={() => change((current) => ({ ...current, players: current.players.map((item) => item.id === player.id ? { ...item, boxings: Math.max(0, item.boxings - 1) } : item) }))}>−</Button>
+            <output {...stylex.props(styles.counterOutput)}>{player.boxings}</output>
+            <Button variant="outline" size="icon-lg" aria-label={`Add one Boxing to ${player.name}`} onClick={() => change((current) => ({ ...current, players: current.players.map((item) => item.id === player.id ? { ...item, boxings: item.boxings + 1 } : item) }))}>+</Button>
+          </div>
+        ))}
+      </Card>
+      <Card className={stylex.props(styles.appCard, styles.training).className}>
+        <div {...stylex.props(styles.sectionHeading)}><h2 {...stylex.props(styles.headingTwo)}>Training baseline</h2><Button variant="ghost" onClick={() => change((current) => ({ ...current, preferences: { dim: !current.preferences.dim } }))}>{session.preferences.dim ? "Brighten" : "Dim table"}</Button></div>
+        <div {...stylex.props(styles.trainingTrack)} aria-label={`Training baseline position ${trainingPosition} of ${trackLength}`}>{Array.from({ length: trackLength }, (_, index) => <div {...stylex.props(styles.trackSpace, index + 1 === trainingPosition ? styles.currentTrackSpace : index + 1 < trainingPosition && styles.reachedTrackSpace)} key={index}><span>{index + 1}</span>{index + 1 === trainingPosition && <strong {...stylex.props(styles.currentTrackLabel)}>Baseline</strong>}</div>)}</div>
+        <p {...stylex.props(styles.paragraph)}><strong>Baseline — no extra Train effects.</strong> Your physical Training cube is authoritative.</p>
+      </Card>
+    </main>
+  )
 }
 
 function Counter({ label, value, change }: { label: string; value: number; change: (amount: number) => void }) {
-  return <div className="counter"><span>{label}</span><button onClick={() => change(-1)}>−</button><output>{value}</output><button onClick={() => change(1)}>+</button></div>
+  return <div {...stylex.props(styles.counter)}><span>{label}</span><Button variant="outline" size="icon-lg" aria-label={`Decrease ${label}`} onClick={() => change(-1)}>−</Button><output {...stylex.props(styles.counterOutput)}>{value}</output><Button variant="outline" size="icon-lg" aria-label={`Increase ${label}`} onClick={() => change(1)}>+</Button></div>
 }
