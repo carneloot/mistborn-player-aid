@@ -17,8 +17,8 @@ const styles = stylex.create({
 		cursor: { ':disabled': 'not-allowed', default: 'pointer' },
 		display: 'inline-flex',
 		flexShrink: 0,
-		fontSize: '0.875rem',
-		fontWeight: 500,
+		fontSize: '0.9375rem',
+		fontWeight: 700,
 		gap: '0.5rem',
 		justifyContent: 'center',
 		opacity: { ':disabled': 0.5, default: 1 },
@@ -26,6 +26,7 @@ const styles = stylex.create({
 		pointerEvents: { ':disabled': 'none', default: null },
 		transition:
 			'color 0.15s, background-color 0.15s, box-shadow 0.15s, border-color 0.15s',
+		touchAction: 'manipulation',
 		whiteSpace: 'nowrap',
 	},
 	default: {
@@ -78,11 +79,11 @@ const styles = stylex.create({
 		boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
 		color: colors.secondaryForeground,
 	},
-	sizeDefault: { height: '2.25rem', paddingInline: '1rem' },
-	sizeIcon: { height: '2.25rem', paddingInline: 0, width: '2.25rem' },
-	sizeIconLg: { height: '2.5rem', paddingInline: 0, width: '2.5rem' },
+	sizeDefault: { height: '2.75rem', paddingInline: '1rem' },
+	sizeIcon: { height: '2.75rem', paddingInline: 0, width: '2.75rem' },
+	sizeIconLg: { height: '2.75rem', paddingInline: 0, width: '2.75rem' },
 	sizeIconSm: { height: '2rem', paddingInline: 0, width: '2rem' },
-	sizeLg: { height: '2.5rem', paddingInline: '2rem' },
+	sizeLg: { height: '3.125rem', paddingInline: '2rem' },
 	sizeSm: { height: '2rem', paddingInline: '0.75rem' },
 });
 

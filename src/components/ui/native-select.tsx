@@ -33,8 +33,8 @@ const styles = stylex.create({
 		},
 		color: colors.foreground,
 		cursor: { ':disabled': 'not-allowed', default: 'pointer' },
-		fontSize: '0.875rem',
-		height: '2.25rem',
+		fontSize: '1rem',
+		height: '2.75rem',
 		lineHeight: '1.25rem',
 		minWidth: 0,
 		opacity: { ':disabled': 0.5, default: 1 },
@@ -45,6 +45,7 @@ const styles = stylex.create({
 		paddingTop: '0.5rem',
 		transition:
 			'color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, border-color 0.15s ease-in-out',
+		touchAction: 'manipulation',
 		width: '100%',
 	},
 	selectSm: {

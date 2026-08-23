@@ -8,7 +8,7 @@ export const styles = stylex.create({
 	root: {
 		backgroundColor: colors.background,
 		color: colors.foreground,
-		fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
+		fontFamily: 'Avenir Next, Avenir, ui-sans-serif, system-ui, sans-serif',
 		fontSynthesis: 'none',
 		inset: 0,
 		minWidth: '320px',
@@ -22,7 +22,12 @@ export const styles = stylex.create({
 		lineHeight: 0.95,
 		marginTop: 0,
 	},
-	headingTwo: { fontSize: '1.1rem', marginTop: 0 },
+	headingTwo: {
+		fontFamily: 'Georgia, ui-serif, serif',
+		fontSize: '1.25rem',
+		letterSpacing: '-0.015em',
+		marginTop: 0,
+	},
 	paragraph: { marginTop: 0 },
 	link: { color: colors.link },
 	eyebrow: {
@@ -42,21 +47,26 @@ export const styles = stylex.create({
 		maxWidth: '44rem',
 	},
 	finePrint: {
-		color: colors.mutedForeground,
+		color: '#c0c7b7',
 		fontSize: '0.85rem',
 		marginTop: 0,
 	},
 	launch: {
 		alignContent: 'center',
 		backgroundColor: colors.background,
-		backgroundImage: `radial-gradient(circle at 76% 20%, ${colors.launchGlow} 0, transparent 35%)`,
+		backgroundImage:
+			`radial-gradient(ellipse at 78% 28%, ${colors.launchGlow} 0, transparent 27%), radial-gradient(ellipse at 96% 80%, ${colors.launchGlow} 0, transparent 30%)`,
 		display: 'grid',
-		gap: '1.25rem',
+		gap: '1.5rem',
 		justifyItems: 'start',
-		padding: 'clamp(2rem, 8vw, 8rem)',
+		padding: {
+			default: 'clamp(2rem, 8vw, 8rem)',
+			[mobile]: '2rem 1.25rem',
+		},
 	},
 	launchAction: {
-		minWidth: '240px',
+		boxShadow: '0 12px 30px rgb(0 0 0 / 0.25)',
+		minWidth: { default: '260px', [mobile]: '100%' },
 		textAlign: 'center',
 		textDecorationLine: 'none',
 	},
@@ -78,7 +88,10 @@ export const styles = stylex.create({
 	setup: {
 		margin: '0 auto',
 		maxWidth: '1000px',
-		padding: '2rem clamp(1rem, 4vw, 3rem)',
+		padding: {
+			default: '2rem clamp(1rem, 4vw, 3rem)',
+			[mobile]: '1.5rem 1rem',
+		},
 	},
 	setupHeader: { marginBottom: '1.5rem' },
 	setupUtility: {
@@ -202,7 +215,13 @@ export const styles = stylex.create({
 		gap: '0.4rem',
 		gridTemplateColumns: '1fr 44px 46px 44px',
 	},
-	counterOutput: { fontSize: '1.5rem', fontWeight: 800, textAlign: 'center' },
+	counterOutput: {
+		fontSize: '1.5rem',
+		fontVariantNumeric: 'tabular-nums',
+		fontWeight: 800,
+		minWidth: '2ch',
+		textAlign: 'center',
+	},
 	spend: {
 		display: 'flex',
 		flexWrap: 'wrap',
@@ -290,9 +309,10 @@ export const styles = stylex.create({
 		fontSize: '0.8rem',
 		fontWeight: 700,
 		gap: '0.35rem',
-		height: '2.25rem',
+		height: '2.75rem',
 		paddingInline: '0.6rem',
 		textTransform: 'capitalize',
+		touchAction: 'manipulation',
 	},
 	themeToggleIcon: { height: '1rem', width: '1rem' },
 });
