@@ -78,6 +78,11 @@ export const createSession = (
 export const baselineTraining = (session: Session): number =>
 	Math.floor(session.completedTurns / session.players.length) + 1;
 
+export const boxingCost = 2;
+
+export const boxingsFromTurnCoins = (coins: number): number =>
+	Math.floor(coins / boxingCost);
+
 export const paymentFor = (
 	coins: number,
 	boxings: number,

@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { baselineTraining, createSession, paymentFor } from './session';
+import {
+	baselineTraining,
+	boxingsFromTurnCoins,
+	createSession,
+	paymentFor,
+} from './session';
 
 const session = () =>
 	createSession([
@@ -38,5 +43,11 @@ describe('baselineTraining', () => {
 	it("includes the current player's start-of-turn advance", () => {
 		expect(baselineTraining(session())).toBe(1);
 		expect(baselineTraining({ ...session(), completedTurns: 2 })).toBe(2);
+	});
+});
+
+describe('boxingsFromTurnCoins', () => {
+	it('converts each pair of turn coins into a Boxing', () => {
+		expect(boxingsFromTurnCoins(5)).toBe(2);
 	});
 });

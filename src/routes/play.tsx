@@ -8,7 +8,12 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 
 import { styles } from '../app.styles';
-import { baselineTraining, paymentFor } from '../domain/session';
+import {
+	baselineTraining,
+	boxingCost,
+	boxingsFromTurnCoins,
+	paymentFor,
+} from '../domain/session';
 import { useSession } from '../hooks/use-session';
 
 const checklist = [
@@ -43,11 +48,18 @@ function PlayPage() {
 				direction === 1
 					? current.completedTurns + 1
 					: Math.max(0, current.completedTurns - 1);
+			const earnedBoxings =
+				direction === 1 ? boxingsFromTurnCoins(current.scratchpad.coins) : 0;
 			return {
 				...current,
 				activePlayerId: current.players[nextIndex].id,
 				completedTurns,
 				round: Math.floor(completedTurns / current.players.length) + 1,
+				players: current.players.map((player) =>
+					player.id === current.activePlayerId
+						? { ...player, boxings: player.boxings + earnedBoxings }
+						: player,
+				),
 				scratchpad: {
 					...current.scratchpad,
 					coins: 0,
@@ -250,7 +262,9 @@ function PlayPage() {
 					<Button variant="secondary" onClick={() => spend(purchaseCost)}>
 						Pay cost
 					</Button>
-					<Button onClick={() => spend(2, true)}>Buy Boxing · 2</Button>
+					<Button onClick={() => spend(boxingCost, true)}>
+						Buy Boxing · {boxingCost}
+					</Button>
 				</div>
 				{session.scratchpad.lastPayment && (
 					<p {...stylex.props(styles.paragraph)}>
