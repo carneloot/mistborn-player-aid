@@ -79,6 +79,7 @@ function PlayPage() {
 				current.scratchpad.coins,
 				player.boxings,
 				cost,
+				!addBoxing,
 			);
 			if (receipt.remainingUnpaid > 0) return current;
 			const payment = `Paid ${receipt.paidTurnCoins} turn coin${receipt.paidTurnCoins === 1 ? '' : 's'}${receipt.paidBoxings ? ` + ${receipt.paidBoxings} Boxing${receipt.paidBoxings === 1 ? '' : 's'}` : ''}.`;

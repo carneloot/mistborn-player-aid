@@ -24,6 +24,14 @@ describe('paymentFor', () => {
 			remainingUnpaid: 2,
 		});
 	});
+
+	it('does not spend Boxings when they are not an allowed payment method', () => {
+		expect(paymentFor(1, 2, 2, false)).toEqual({
+			paidTurnCoins: 1,
+			paidBoxings: 0,
+			remainingUnpaid: 1,
+		});
+	});
 });
 
 describe('baselineTraining', () => {

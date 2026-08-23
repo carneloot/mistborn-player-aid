@@ -78,10 +78,15 @@ export const createSession = (
 export const baselineTraining = (session: Session): number =>
 	Math.floor(session.completedTurns / session.players.length) + 1;
 
-export const paymentFor = (coins: number, boxings: number, cost: number) => {
+export const paymentFor = (
+	coins: number,
+	boxings: number,
+	cost: number,
+	useBoxings = true,
+) => {
 	const paidTurnCoins = Math.min(coins, cost);
 	const remaining = cost - paidTurnCoins;
-	const paidBoxings = Math.min(boxings, remaining);
+	const paidBoxings = useBoxings ? Math.min(boxings, remaining) : 0;
 	return {
 		paidTurnCoins,
 		paidBoxings,
