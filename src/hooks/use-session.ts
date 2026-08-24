@@ -1,13 +1,14 @@
 import { useAtomSet, useAtomValue } from '@effect/atom-react';
 
 import type { Session } from '../domain/session';
-import { sessionAtom, undoAtom } from '../state/session';
+import { randomizeSetupAtom, sessionAtom, undoAtom } from '../state/session';
 
 export function useSession() {
 	const session = useAtomValue(sessionAtom);
 	const setSession = useAtomSet(sessionAtom);
 	const undo = useAtomValue(undoAtom);
 	const setUndo = useAtomSet(undoAtom);
+	const randomizeSetup = useAtomSet(randomizeSetupAtom);
 	const change = (fn: (current: Session) => Session) =>
 		setSession((current) => {
 			if (current === null) return current;
@@ -26,6 +27,7 @@ export function useSession() {
 		session,
 		setSession,
 		setUndo,
+		randomizeSetup,
 		change,
 		undoLast,
 		canUndo: undo.length > 0,

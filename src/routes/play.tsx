@@ -7,9 +7,11 @@ import { Card } from '@/components/ui/card';
 
 import { styles } from '../app.styles';
 import {
+	adjustBoxings,
+	adjustScratchpad,
+	advanceTurn,
 	baselineTraining,
-	boxingsFromTurnCoins,
-	paymentFor,
+	spend,
 } from '../domain/session';
 import { useSession } from '../hooks/use-session';
 import { ThemeToggle } from './__root';
@@ -31,80 +33,12 @@ function PlayPage() {
 	const minimumPurchaseCost = availableToSpend === 0 ? 0 : 1;
 	const selectedPurchaseCost = Math.min(purchaseCost, availableToSpend);
 	const nextTurn = (direction: 1 | -1) => {
-		if (direction === -1 && session.completedTurns === 0) return;
-		change((current) => {
-			const index = current.players.findIndex(
-				(player) => player.id === current.activePlayerId,
-			);
-			const nextIndex =
-				(index + direction + current.players.length) % current.players.length;
-			const completedTurns =
-				direction === 1
-					? current.completedTurns + 1
-					: Math.max(0, current.completedTurns - 1);
-			const earnedBoxings =
-				direction === 1 ? boxingsFromTurnCoins(current.scratchpad.coins) : 0;
-			return {
-				...current,
-				activePlayerId: current.players[nextIndex].id,
-				completedTurns,
-				round: Math.floor(completedTurns / current.players.length) + 1,
-				players: current.players.map((player) =>
-					player.id === current.activePlayerId
-						? { ...player, boxings: player.boxings + earnedBoxings }
-						: player,
-				),
-				scratchpad: {
-					...current.scratchpad,
-					coins: 0,
-					combat: 0,
-					missionPoints: 0,
-					lastPayment: null,
-				},
-			};
-		});
+		change((current) => advanceTurn(current, direction));
 	};
 	const adjustScratch = (
 		key: 'coins' | 'combat' | 'missionPoints',
 		amount: number,
-	) =>
-		change((current) => ({
-			...current,
-			scratchpad: {
-				...current.scratchpad,
-				[key]: Math.max(0, current.scratchpad[key] + amount),
-			},
-		}));
-	const spend = (cost: number) =>
-		change((current) => {
-			const player = current.players.find(
-				(item) => item.id === current.activePlayerId,
-			);
-			if (!player) return current;
-			const receipt = paymentFor(
-				current.scratchpad.coins,
-				player.boxings,
-				cost,
-			);
-			if (receipt.remainingUnpaid > 0) return current;
-			const payment = `Paid ${receipt.paidTurnCoins} turn coin${receipt.paidTurnCoins === 1 ? '' : 's'}${receipt.paidBoxings ? ` + ${receipt.paidBoxings} Boxing${receipt.paidBoxings === 1 ? '' : 's'}` : ''}.`;
-			return {
-				...current,
-				scratchpad: {
-					...current.scratchpad,
-					coins: current.scratchpad.coins - receipt.paidTurnCoins,
-					lastPayment: payment,
-				},
-				players: current.players.map((item) =>
-					item.id === player.id
-						? {
-								...item,
-								boxings: item.boxings - receipt.paidBoxings,
-							}
-						: item,
-				),
-			};
-		});
+	) => change((current) => adjustScratchpad(current, key, amount));
 	const trainingPosition = baselineTraining(session);
 	const trackLength = Math.max(10, trainingPosition);
 	const endGame = () => {
@@ -212,7 +146,9 @@ function PlayPage() {
 				/>
 				<Button
 					disabled={selectedPurchaseCost === 0}
-					onClick={() => spend(selectedPurchaseCost)}
+					onClick={() =>
+						change((current) => spend(current, selectedPurchaseCost))
+					}
 				>
 					Buy
 				</Button>
@@ -248,17 +184,7 @@ function PlayPage() {
 					<Counter
 						accessibleLabel={`${player.name} Boxings`}
 						change={(amount) =>
-							change((current) => ({
-								...current,
-								players: current.players.map((item) =>
-									item.id === player.id
-										? {
-												...item,
-												boxings: Math.max(0, item.boxings + amount),
-											}
-										: item,
-								),
-							}))
+							change((current) => adjustBoxings(current, player.id, amount))
 						}
 						isActive={player.id === active.id}
 						key={player.id}

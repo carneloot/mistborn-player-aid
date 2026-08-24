@@ -71,6 +71,55 @@ export const createSession = (
 	},
 });
 
+export const applySetupRandomization = (
+	session: Session,
+	{
+		firstPlayerId,
+		assignedCharacters,
+		selectedMissions,
+	}: {
+		firstPlayerId: string;
+		assignedCharacters: readonly string[];
+		selectedMissions: readonly string[];
+	},
+): Session => {
+	return {
+		...session,
+		firstPlayerId,
+		activePlayerId: firstPlayerId,
+		players: session.players.map((player, index) => ({
+			...player,
+			character: assignedCharacters[index],
+		})),
+		missions: [...selectedMissions],
+	};
+};
+
+export const isSetupReady = (session: Session): boolean =>
+	session.firstPlayerId !== null &&
+	session.missions.length === 3 &&
+	session.players.every((player) => player.character !== null);
+
+export const completeSetup = (session: Session): Session =>
+	isSetupReady(session) ? { ...session, setupComplete: true } : session;
+
+export const turnOrderFromFirstPlayer = (
+	players: readonly Player[],
+	firstPlayerId: string | null,
+): Player[] => {
+	const firstIndex = players.findIndex((player) => player.id === firstPlayerId);
+	return firstIndex < 0
+		? []
+		: [...players.slice(firstIndex), ...players.slice(0, firstIndex)];
+};
+
+export const startingBonus = (turnPosition: number): string => {
+	if (turnPosition === 0) return '36 health';
+	if (turnPosition === 1) return '38 health';
+	if (turnPosition === 2) return '40 health';
+	return '40 health · 1 Boxing';
+};
+
 export const baselineTraining = (session: Session): number =>
 	Math.floor(session.completedTurns / session.players.length) + 1;
 
@@ -85,5 +134,87 @@ export const paymentFor = (coins: number, boxings: number, cost: number) => {
 		paidTurnCoins,
 		paidBoxings,
 		remainingUnpaid: remaining - paidBoxings,
+	};
+};
+
+export const advanceTurn = (session: Session, direction: 1 | -1): Session => {
+	if (direction === -1 && session.completedTurns === 0) return session;
+	const activeIndex = session.players.findIndex(
+		(player) => player.id === session.activePlayerId,
+	);
+	if (activeIndex < 0) return session;
+	const completedTurns =
+		direction === 1
+			? session.completedTurns + 1
+			: Math.max(0, session.completedTurns - 1);
+	const earnedBoxings =
+		direction === 1 ? boxingsFromTurnCoins(session.scratchpad.coins) : 0;
+	const nextIndex =
+		(activeIndex + direction + session.players.length) % session.players.length;
+	return {
+		...session,
+		activePlayerId: session.players[nextIndex].id,
+		completedTurns,
+		round: Math.floor(completedTurns / session.players.length) + 1,
+		players: session.players.map((player) =>
+			player.id === session.activePlayerId
+				? { ...player, boxings: player.boxings + earnedBoxings }
+				: player,
+		),
+		scratchpad: {
+			...session.scratchpad,
+			coins: 0,
+			combat: 0,
+			missionPoints: 0,
+			lastPayment: null,
+		},
+	};
+};
+
+export const adjustScratchpad = (
+	session: Session,
+	key: keyof Omit<Session['scratchpad'], 'lastPayment'>,
+	amount: number,
+): Session => ({
+	...session,
+	scratchpad: {
+		...session.scratchpad,
+		[key]: Math.max(0, session.scratchpad[key] + amount),
+	},
+});
+
+export const adjustBoxings = (
+	session: Session,
+	playerId: string,
+	amount: number,
+): Session => ({
+	...session,
+	players: session.players.map((player) =>
+		player.id === playerId
+			? { ...player, boxings: Math.max(0, player.boxings + amount) }
+			: player,
+	),
+});
+
+export const spend = (session: Session, cost: number): Session => {
+	const player = session.players.find(
+		(item) => item.id === session.activePlayerId,
+	);
+	if (!player) return session;
+	const receipt = paymentFor(session.scratchpad.coins, player.boxings, cost);
+	if (receipt.remainingUnpaid > 0) return session;
+	const payment = `Paid ${receipt.paidTurnCoins} turn coin${receipt.paidTurnCoins === 1 ? '' : 's'}${receipt.paidBoxings ? ` + ${receipt.paidBoxings} Boxing${receipt.paidBoxings === 1 ? '' : 's'}` : ''}.`;
+	return {
+		...session,
+		scratchpad: {
+			...session.scratchpad,
+			coins: session.scratchpad.coins - receipt.paidTurnCoins,
+			lastPayment: payment,
+		},
+		players: session.players.map((item) =>
+			item.id === player.id
+				? { ...item, boxings: item.boxings - receipt.paidBoxings }
+				: item,
+		),
 	};
 };

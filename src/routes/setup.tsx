@@ -26,26 +26,18 @@ import { Input } from '@/components/ui/input';
 
 import { styles } from '../app.styles';
 import {
-	characters,
+	completeSetup,
 	createSession,
-	missions,
+	isSetupReady,
 	playerColors,
+	startingBonus,
+	turnOrderFromFirstPlayer,
 	type PlayerColor,
 } from '../domain/session';
 import { useSession } from '../hooks/use-session';
 import { ThemeToggle } from './__root';
 
-const shuffle = <T,>(values: readonly T[]) =>
-	[...values].sort(() => Math.random() - 0.5);
-
 type PlayerDraft = { id: string; name: string };
-
-const startingBonus = (turnPosition: number) => {
-	if (turnPosition === 0) return '36 health';
-	if (turnPosition === 1) return '38 health';
-	if (turnPosition === 2) return '40 health';
-	return '40 health · 1 Boxing';
-};
 
 function SortablePlayer({
 	index,
@@ -87,7 +79,7 @@ function SortablePlayer({
 }
 
 function SetupPage() {
-	const { session, setSession, setUndo, change } = useSession();
+	const { session, setSession, setUndo, randomizeSetup, change } = useSession();
 	const navigate = useNavigate();
 	const [count, setCount] = useState(session?.players.length ?? 2);
 	const [players, setPlayers] = useState<PlayerDraft[]>(
@@ -134,28 +126,11 @@ function SetupPage() {
 	};
 	const rollSetup = () => {
 		if (!draft) return;
-		const first = shuffle(draft.players)[0];
-		const assigned = shuffle(characters);
-		const selectedMissions = shuffle(missions).slice(0, 3);
-		change((current) => ({
-			...current,
-			firstPlayerId: first.id,
-			activePlayerId: first.id,
-			players: current.players.map((player, index) => ({
-				...player,
-				character: assigned[index],
-			})),
-			missions: selectedMissions,
-		}));
+		randomizeSetup();
 	};
 	const confirm = () => {
-		if (
-			!draft?.firstPlayerId ||
-			draft.missions.length !== 3 ||
-			draft.players.some((player) => !player.character)
-		)
-			return;
-		change((current) => ({ ...current, setupComplete: true }));
+		if (!draft || !isSetupReady(draft)) return;
+		change(completeSetup);
 		navigate({ to: '/play' });
 	};
 	const returnToPlayerSetup = () => {
@@ -252,20 +227,11 @@ function SetupPage() {
 				</Card>
 			</main>
 		);
-	const first = draft.players.find(
-		(player) => player.id === draft.firstPlayerId,
+	const turnOrder = turnOrderFromFirstPlayer(
+		draft.players,
+		draft.firstPlayerId,
 	);
-	const turnOrder = first
-		? [
-				...draft.players.slice(
-					draft.players.findIndex((player) => player.id === first.id),
-				),
-				...draft.players.slice(
-					0,
-					draft.players.findIndex((player) => player.id === first.id),
-				),
-			]
-		: [];
+	const first = turnOrder[0];
 	return (
 		<main {...stylex.props(styles.app, styles.setup)}>
 			<header {...stylex.props(styles.setupHeader)}>
@@ -349,11 +315,7 @@ function SetupPage() {
 				<Button
 					className={stylex.props(styles.setupAction).className}
 					variant={first ? 'default' : 'secondary'}
-					disabled={
-						!first ||
-						draft.missions.length !== 3 ||
-						draft.players.some((player) => !player.character)
-					}
+					disabled={!isSetupReady(draft)}
 					onClick={confirm}
 				>
 					Confirm setup & start play
