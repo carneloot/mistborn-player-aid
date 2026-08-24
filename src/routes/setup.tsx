@@ -23,10 +23,6 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import {
-	NativeSelect,
-	NativeSelectOption,
-} from '@/components/ui/native-select';
 
 import { styles } from '../app.styles';
 import {
@@ -46,9 +42,9 @@ type PlayerDraft = { id: string; name: string };
 
 const startingBonus = (turnPosition: number) => {
 	if (turnPosition === 0) return '36 health';
-	if (turnPosition === 1) return '+2 health';
-	if (turnPosition === 2) return '+4 health';
-	return '+4 health · 1 Boxing';
+	if (turnPosition === 1) return '38 health';
+	if (turnPosition === 2) return '40 health';
+	return '40 health · 1 Boxing';
 };
 
 function SortablePlayer({
@@ -74,7 +70,7 @@ function SortablePlayer({
 				{...attributes}
 				{...listeners}
 				size="icon"
-				variant="outline"
+				variant="ghost"
 			>
 				<GripVerticalIcon aria-hidden="true" />
 			</Button>
@@ -188,30 +184,42 @@ function SetupPage() {
 							initialize();
 						}}
 					>
-						<label {...stylex.props(styles.fieldLabel)}>
-							Players
-							<NativeSelect
-								value={count}
-								onChange={(event) => {
-									const next = Number(event.target.value);
-									setCount(next);
-									setPlayers((current) =>
-										Array.from(
-											{ length: next },
-											(_, index) =>
-												current[index] ?? {
-													id: `player-draft-${index + 1}`,
-													name: '',
-												},
-										),
-									);
-								}}
-							>
-								<NativeSelectOption value={2}>2</NativeSelectOption>
-								<NativeSelectOption value={3}>3</NativeSelectOption>
-								<NativeSelectOption value={4}>4</NativeSelectOption>
-							</NativeSelect>
-						</label>
+						<fieldset {...stylex.props(styles.playerCountField)}>
+							<legend {...stylex.props(styles.fieldLegend)}>Game size</legend>
+							<div {...stylex.props(styles.playerCountOptions)}>
+								{[2, 3, 4].map((playerCount) => (
+									<label
+										key={playerCount}
+										{...stylex.props(
+											styles.playerCountOption,
+											count === playerCount && styles.playerCountOptionSelected,
+										)}
+									>
+										<input
+											{...stylex.props(styles.playerCountRadio)}
+											checked={count === playerCount}
+											name="player-count"
+											onChange={() => {
+												setCount(playerCount);
+												setPlayers((current) =>
+													Array.from(
+														{ length: playerCount },
+														(_, index) =>
+															current[index] ?? {
+																id: `player-draft-${index + 1}`,
+																name: '',
+															},
+													),
+												);
+											}}
+											type="radio"
+											value={playerCount}
+										/>
+										{playerCount} players
+									</label>
+								))}
+							</div>
+						</fieldset>
 						<p {...stylex.props(styles.playerOrderHint)}>
 							Drag players into turn order.
 						</p>
