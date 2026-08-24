@@ -211,6 +211,14 @@ export const styles = stylex.create({
 		gap: '0.4rem',
 		gridTemplateColumns: '1fr 44px 46px 44px',
 	},
+	activeCounter: {
+		backgroundColor: colors.accent,
+		borderColor: colors.primary,
+		borderRadius: radius.md,
+		borderStyle: 'solid',
+		borderWidth: '1px',
+		padding: '0.35rem',
+	},
 	counterOutput: {
 		fontSize: '1.5rem',
 		fontVariantNumeric: 'tabular-nums',

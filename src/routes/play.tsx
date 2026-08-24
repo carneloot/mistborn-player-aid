@@ -264,6 +264,7 @@ function PlayPage() {
 								),
 							}))
 						}
+						isActive={player.id === active.id}
 						key={player.id}
 						label={
 							<span {...stylex.props(styles.playerCounterLabel)}>
@@ -316,6 +317,7 @@ function Counter({
 	accessibleLabel,
 	value,
 	change,
+	isActive = false,
 	min = 0,
 	max = Number.POSITIVE_INFINITY,
 }: {
@@ -323,13 +325,14 @@ function Counter({
 	accessibleLabel?: string;
 	value: number;
 	change: (amount: number) => void;
+	isActive?: boolean;
 	min?: number;
 	max?: number;
 }) {
 	const counterLabel =
 		accessibleLabel ?? (typeof label === 'string' ? label : 'value');
 	return (
-		<div {...stylex.props(styles.counter)}>
+		<div {...stylex.props(styles.counter, isActive && styles.activeCounter)}>
 			<span>{label}</span>
 			<Button
 				variant="outline"
