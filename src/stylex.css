@@ -15,3 +15,13 @@ body,
 body {
 	margin: 0;
 }
+
+@media (prefers-reduced-motion: reduce) {
+	button {
+		transition: none !important;
+	}
+
+	button:active {
+		transform: none !important;
+	}
+}

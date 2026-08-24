@@ -21,12 +21,14 @@ const styles = stylex.create({
 		fontWeight: 700,
 		gap: '0.5rem',
 		justifyContent: 'center',
-		opacity: { ':disabled': 0.5, default: 1 },
+		opacity: { ':active': 0.82, ':disabled': 0.5, default: 1 },
 		outline: 'none',
 		pointerEvents: { ':disabled': 'none', default: null },
 		transition:
-			'color 0.15s, background-color 0.15s, box-shadow 0.15s, border-color 0.15s',
+			'color 0.12s, background-color 0.12s, box-shadow 0.12s, border-color 0.12s, opacity 0.1s, transform 0.1s ease-out',
+		transform: { ':active': 'scale(0.97)', default: 'scale(1)' },
 		touchAction: 'manipulation',
+		userSelect: 'none',
 		whiteSpace: 'nowrap',
 	},
 	default: {

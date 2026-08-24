@@ -302,9 +302,13 @@ export const styles = stylex.create({
 		fontWeight: 700,
 		gap: '0.35rem',
 		height: '2.75rem',
+		opacity: { ':active': 0.82, default: 1 },
 		paddingInline: '0.6rem',
 		textTransform: 'capitalize',
 		touchAction: 'manipulation',
+		transform: { ':active': 'scale(0.97)', default: 'scale(1)' },
+		transition: 'opacity 0.1s, transform 0.1s ease-out',
+		userSelect: 'none',
 	},
 	themeToggleIcon: { height: '1rem', width: '1rem' },
 });
