@@ -107,6 +107,30 @@ export const styles = stylex.create({
 		gap: '0.4rem',
 		marginBottom: '1rem',
 	},
+	playerOrderHint: {
+		color: colors.lede,
+		marginBottom: '1rem',
+		marginTop: 0,
+	},
+	playerEntry: {
+		alignItems: 'end',
+		display: 'grid',
+		gap: '0.5rem',
+		gridTemplateColumns: '2.75rem minmax(0, 1fr)',
+	},
+	playerDragHandle: {
+		cursor: 'grab',
+		marginBottom: '1rem',
+		touchAction: 'none',
+	},
+	playerName: { minWidth: 0 },
+	startingBonuses: { display: 'grid', gap: '0.5rem' },
+	startingBonus: {
+		alignItems: 'baseline',
+		display: 'flex',
+		gap: '0.75rem',
+		justifyContent: 'space-between',
+	},
 	setupSubmit: {
 		bottom: 'max(0.75rem, env(safe-area-inset-bottom))',
 		position: { default: 'static', [mobile]: 'sticky' },

@@ -6,6 +6,9 @@
       "name": "mistborn-player-aid",
       "dependencies": {
         "@base-ui/react": "1.7.0",
+        "@dnd-kit/core": "6.3.1",
+        "@dnd-kit/sortable": "10.0.0",
+        "@dnd-kit/utilities": "3.2.2",
         "@effect/atom-react": "4.0.0-rc.111",
         "@effect/platform-browser": "4.0.0-rc.111",
         "@stylexjs/stylex": "0.19.0",
@@ -195,6 +198,14 @@
     "@distilled.cloud/neon": ["@distilled.cloud/neon@1.0.0-rc.6", "", { "dependencies": { "@distilled.cloud/core": "1.0.0-rc.6" }, "peerDependencies": { "effect": ">=4.0.0-rc.110 || >=4.0.0" } }, "sha512-yn+4GhQ8Gu5GVcx3g1zxVCheBSmaQE5FAA5TzzXnlIiKUwmMLVTB/ucwJpDYhoUxjWK7bnv1eVZReoibYMHX4g=="],
 
     "@distilled.cloud/planetscale": ["@distilled.cloud/planetscale@1.0.0-rc.6", "", { "dependencies": { "@distilled.cloud/core": "1.0.0-rc.6" }, "peerDependencies": { "effect": ">=4.0.0-rc.110 || >=4.0.0" } }, "sha512-6lIFwZAXiQCJ9u5QMIyY72qTdYbWmGAt7+HbONFEvmihwvecFuRo1i1QYkx5j9EN8c54KeO7CcEBq7HXpvwIhQ=="],
+
+    "@dnd-kit/accessibility": ["@dnd-kit/accessibility@3.1.1", "", { "dependencies": { "tslib": "^2.0.0" }, "peerDependencies": { "react": ">=16.8.0" } }, "sha512-2P+YgaXF+gRsIihwwY1gCsQSYnu9Zyj2py8kY5fFvUM1qm2WA2u639R6YNVfU4GWr+ZM5mqEsfHZZLoRONbemw=="],
+
+    "@dnd-kit/core": ["@dnd-kit/core@6.3.1", "", { "dependencies": { "@dnd-kit/accessibility": "^3.1.1", "@dnd-kit/utilities": "^3.2.2", "tslib": "^2.0.0" }, "peerDependencies": { "react": ">=16.8.0", "react-dom": ">=16.8.0" } }, "sha512-xkGBRQQab4RLwgXxoqETICr6S5JlogafbhNsidmrkVv2YRs5MLwpjoF2qpiGjQt8S9AoxtIV603s0GIUpY5eYQ=="],
+
+    "@dnd-kit/sortable": ["@dnd-kit/sortable@10.0.0", "", { "dependencies": { "@dnd-kit/utilities": "^3.2.2", "tslib": "^2.0.0" }, "peerDependencies": { "@dnd-kit/core": "^6.3.0", "react": ">=16.8.0" } }, "sha512-+xqhmIIzvAYMGfBYYnbKuNicfSsk4RksY2XdmJhT+HAC01nix6fHCztU68jooFiMUB01Ky3F0FyOvhG/BZrWkg=="],
+
+    "@dnd-kit/utilities": ["@dnd-kit/utilities@3.2.2", "", { "dependencies": { "tslib": "^2.0.0" }, "peerDependencies": { "react": ">=16.8.0" } }, "sha512-+MKAJEOfaBe5SmV6t34p80MMKhjvUz0vRrvVJbPT0WElzaOJ/1xs+D+KDv+tD/NE5ujfrChEcshd4fLn0wpiqg=="],
 
     "@dual-bundle/import-meta-resolve": ["@dual-bundle/import-meta-resolve@4.2.1", "", {}, "sha512-id+7YRUgoUX6CgV0DtuhirQWodeeA7Lf4i2x71JS/vtA5pRb/hIGWlw+G6MeXvsM+MXrz0VAydTGElX1rAfgPg=="],
 

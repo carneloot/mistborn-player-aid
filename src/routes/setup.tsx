@@ -1,5 +1,23 @@
+import {
+	closestCenter,
+	DndContext,
+	KeyboardSensor,
+	PointerSensor,
+	type DragEndEvent,
+	useSensor,
+	useSensors,
+} from '@dnd-kit/core';
+import {
+	arrayMove,
+	SortableContext,
+	sortableKeyboardCoordinates,
+	useSortable,
+	verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import * as stylex from '@stylexjs/stylex';
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { GripVerticalIcon } from 'lucide-react';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -24,22 +42,98 @@ import { ThemeToggle } from './__root';
 const shuffle = <T,>(values: readonly T[]) =>
 	[...values].sort(() => Math.random() - 0.5);
 
+type PlayerDraft = { id: string; name: string };
+
+const startingBonus = (turnPosition: number) => {
+	if (turnPosition === 0) return '36 health';
+	if (turnPosition === 1) return '+2 health';
+	if (turnPosition === 2) return '+4 health';
+	return '+4 health · 1 Boxing';
+};
+
+function SortablePlayer({
+	index,
+	player,
+	onNameChange,
+}: {
+	index: number;
+	player: PlayerDraft;
+	onNameChange: (id: string, name: string) => void;
+}) {
+	const { attributes, listeners, setNodeRef, transform, transition } =
+		useSortable({ id: player.id });
+	return (
+		<div
+			ref={setNodeRef}
+			{...stylex.props(styles.playerEntry)}
+			style={{ transform: CSS.Transform.toString(transform), transition }}
+		>
+			<Button
+				aria-label={`Drag ${player.name || `Player ${index + 1}`} to reorder`}
+				className={stylex.props(styles.playerDragHandle).className}
+				{...attributes}
+				{...listeners}
+				size="icon"
+				variant="outline"
+			>
+				<GripVerticalIcon aria-hidden="true" />
+			</Button>
+			<label {...stylex.props(styles.fieldLabel, styles.playerName)}>
+				Player {index + 1}
+				<Input
+					value={player.name}
+					maxLength={20}
+					onChange={(event) => onNameChange(player.id, event.target.value)}
+				/>
+			</label>
+		</div>
+	);
+}
+
 function SetupPage() {
 	const { session, setSession, setUndo, change } = useSession();
 	const navigate = useNavigate();
 	const [count, setCount] = useState(session?.players.length ?? 2);
-	const [names, setNames] = useState(
+	const [players, setPlayers] = useState<PlayerDraft[]>(
 		() =>
-			session?.players.map((player) => player.name) ?? ['Player 1', 'Player 2'],
+			session?.players.map((player, index) => ({
+				id: `player-draft-${index + 1}`,
+				name: player.name,
+			})) ?? [
+				{ id: 'player-draft-1', name: '' },
+				{ id: 'player-draft-2', name: '' },
+			],
 	);
 	const draft = session && !session.setupComplete ? session : null;
+	const sensors = useSensors(
+		useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+		useSensor(KeyboardSensor, {
+			coordinateGetter: sortableKeyboardCoordinates,
+		}),
+	);
+	const updatePlayerName = (id: string, name: string) =>
+		setPlayers((current) =>
+			current.map((player) =>
+				player.id === id ? { ...player, name } : player,
+			),
+		);
+	const reorderPlayers = ({ active, over }: DragEndEvent) => {
+		if (!over || active.id === over.id) return;
+		setPlayers((current) =>
+			arrayMove(
+				current,
+				current.findIndex((player) => player.id === active.id),
+				current.findIndex((player) => player.id === over.id),
+			),
+		);
+	};
 	const initialize = () => {
-		const players = Array.from({ length: count }, (_, index) => ({
-			name: names[index]?.trim() || `Player ${index + 1}`,
+		const sessionPlayers = players.map((player, index) => ({
+			name: player.name.trim() || `Player ${index + 1}`,
 			color: playerColors[index] as PlayerColor,
 			symbol: ['◆', '●', '▲', '■'][index],
 		}));
-		setSession(createSession(players));
+		setSession(createSession(sessionPlayers));
 		setUndo([]);
 	};
 	const rollSetup = () => {
@@ -67,6 +161,10 @@ function SetupPage() {
 			return;
 		change((current) => ({ ...current, setupComplete: true }));
 		navigate({ to: '/play' });
+	};
+	const returnToPlayerSetup = () => {
+		setSession(null);
+		setUndo([]);
 	};
 	if (!draft)
 		return (
@@ -97,10 +195,14 @@ function SetupPage() {
 								onChange={(event) => {
 									const next = Number(event.target.value);
 									setCount(next);
-									setNames((current) =>
+									setPlayers((current) =>
 										Array.from(
 											{ length: next },
-											(_, index) => current[index] ?? `Player ${index + 1}`,
+											(_, index) =>
+												current[index] ?? {
+													id: `player-draft-${index + 1}`,
+													name: '',
+												},
 										),
 									);
 								}}
@@ -110,22 +212,28 @@ function SetupPage() {
 								<NativeSelectOption value={4}>4</NativeSelectOption>
 							</NativeSelect>
 						</label>
-						{Array.from({ length: count }, (_, index) => (
-							<label key={index} {...stylex.props(styles.fieldLabel)}>
-								Player {index + 1}
-								<Input
-									value={names[index] ?? ''}
-									maxLength={20}
-									onChange={(event) =>
-										setNames((current) =>
-											current.map((name, nameIndex) =>
-												nameIndex === index ? event.target.value : name,
-											),
-										)
-									}
-								/>
-							</label>
-						))}
+						<p {...stylex.props(styles.playerOrderHint)}>
+							Drag players into turn order.
+						</p>
+						<DndContext
+							collisionDetection={closestCenter}
+							onDragEnd={reorderPlayers}
+							sensors={sensors}
+						>
+							<SortableContext
+								items={players.map((player) => player.id)}
+								strategy={verticalListSortingStrategy}
+							>
+								{players.map((player, index) => (
+									<SortablePlayer
+										key={player.id}
+										index={index}
+										onNameChange={updatePlayerName}
+										player={player}
+									/>
+								))}
+							</SortableContext>
+						</DndContext>
 						<Button
 							className={stylex.props(styles.setupSubmit).className}
 							type="submit"
@@ -139,6 +247,17 @@ function SetupPage() {
 	const first = draft.players.find(
 		(player) => player.id === draft.firstPlayerId,
 	);
+	const turnOrder = first
+		? [
+				...draft.players.slice(
+					draft.players.findIndex((player) => player.id === first.id),
+				),
+				...draft.players.slice(
+					0,
+					draft.players.findIndex((player) => player.id === first.id),
+				),
+			]
+		: [];
 	return (
 		<main {...stylex.props(styles.app, styles.setup)}>
 			<header {...stylex.props(styles.setupHeader)}>
@@ -158,22 +277,25 @@ function SetupPage() {
 			</header>
 			<section {...stylex.props(styles.setupGrid)}>
 				<Card className={stylex.props(styles.appCard).className}>
-					<h2 {...stylex.props(styles.headingTwo)}>1. First player</h2>
-					<p {...stylex.props(styles.paragraph)}>
-						{first ? (
-							<>
-								<strong>{first.name}</strong> goes first. Starting health: 36,
-								then +2, +4
-								{draft.players.length === 4 ? ', +4 and 1 Boxing' : ''}.
-							</>
-						) : (
-							'Choose a random first player.'
-						)}
-					</p>
+					<h2 {...stylex.props(styles.headingTwo)}>1. Turn order</h2>
+					{first ? (
+						<div {...stylex.props(styles.startingBonuses)}>
+							{turnOrder.map((player, index) => (
+								<div key={player.id} {...stylex.props(styles.startingBonus)}>
+									<strong>{player.name}</strong>
+									<span>{startingBonus(index)}</span>
+								</div>
+							))}
+						</div>
+					) : (
+						<p {...stylex.props(styles.paragraph)}>
+							Choose a random first player.
+						</p>
+					)}
 					{draft.players.length > 2 && first && (
 						<p {...stylex.props(styles.paragraph)}>
-							Target begins with {draft.players.at(-1)?.name}, last in turn
-							order from first player.
+							Target begins with {turnOrder.at(-1)?.name}, last in turn order
+							from first player.
 						</p>
 					)}
 				</Card>
@@ -204,13 +326,21 @@ function SetupPage() {
 			<div {...stylex.props(styles.setupActions)}>
 				<Button
 					className={stylex.props(styles.setupAction).className}
+					onClick={returnToPlayerSetup}
+					variant="secondary"
+				>
+					Back to player setup
+				</Button>
+				<Button
+					className={stylex.props(styles.setupAction).className}
 					onClick={rollSetup}
+					variant={first ? 'secondary' : 'default'}
 				>
 					{first ? 'Reroll results' : 'Randomize setup'}
 				</Button>
 				<Button
 					className={stylex.props(styles.setupAction).className}
-					variant="secondary"
+					variant={first ? 'default' : 'secondary'}
 					disabled={
 						!first ||
 						draft.missions.length !== 3 ||
