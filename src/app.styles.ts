@@ -276,7 +276,7 @@ export const styles = stylex.create({
 	dialogItem: { maxWidth: '28rem' },
 	themeToggle: {
 		alignItems: 'center',
-		backgroundColor: { ':hover': colors.accent, default: 'transparent' },
+		backgroundColor: 'transparent',
 		borderWidth: 0,
 		borderRadius: radius.md,
 		color: colors.foreground,

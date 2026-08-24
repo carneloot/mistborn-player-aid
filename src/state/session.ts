@@ -14,12 +14,3 @@ export const sessionAtom = Atom.kvs({
 
 export type UndoState = Session | null;
 export const undoAtom = Atom.make<UndoState[]>([]);
-
-export const updateSession = (
-	previous: Session | null,
-	update: (session: Session) => Session,
-	undo: UndoState[],
-): { session: Session | null; undo: UndoState[] } => {
-	if (previous === null) return { session: null, undo };
-	return { session: update(previous), undo: [...undo, previous].slice(-20) };
-};

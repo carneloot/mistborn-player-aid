@@ -1,25 +1,27 @@
 import { useAtomSet, useAtomValue } from '@effect/atom-react';
 
 import type { Session } from '../domain/session';
-import { sessionAtom, undoAtom, updateSession } from '../state/session';
+import { sessionAtom, undoAtom } from '../state/session';
 
 export function useSession() {
 	const session = useAtomValue(sessionAtom);
 	const setSession = useAtomSet(sessionAtom);
 	const undo = useAtomValue(undoAtom);
 	const setUndo = useAtomSet(undoAtom);
-	const change = (fn: (current: Session) => Session) => {
-		const next = updateSession(session, fn, undo);
-		setSession(next.session);
-		setUndo(next.undo);
-	};
-	const undoLast = () => {
-		const previous = undo.at(-1);
-		if (previous !== undefined) {
-			setSession(previous);
-			setUndo(undo.slice(0, -1));
-		}
-	};
+	const change = (fn: (current: Session) => Session) =>
+		setSession((current) => {
+			if (current === null) return current;
+			const next = fn(current);
+			if (next !== current)
+				setUndo((previous) => [...previous, current].slice(-20));
+			return next;
+		});
+	const undoLast = () =>
+		setUndo((current) => {
+			const previous = current.at(-1);
+			if (previous !== undefined) setSession(previous);
+			return current.slice(0, -1);
+		});
 	return {
 		session,
 		setSession,

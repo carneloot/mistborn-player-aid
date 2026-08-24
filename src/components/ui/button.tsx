@@ -30,18 +30,12 @@ const styles = stylex.create({
 		whiteSpace: 'nowrap',
 	},
 	default: {
-		backgroundColor: {
-			':hover': `color-mix(in oklab, ${colors.primary} 90%, transparent)`,
-			default: colors.primary,
-		},
+		backgroundColor: colors.primary,
 		boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
 		color: colors.primaryForeground,
 	},
 	destructive: {
-		backgroundColor: {
-			':hover': `color-mix(in oklab, ${colors.destructive} 90%, transparent)`,
-			default: colors.destructive,
-		},
+		backgroundColor: colors.destructive,
 		boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
 		color: colors.primaryForeground,
 	},
@@ -52,30 +46,24 @@ const styles = stylex.create({
 		},
 	},
 	ghost: {
-		backgroundColor: { ':hover': colors.accent, default: 'transparent' },
-		color: { ':hover': colors.accentForeground, default: colors.foreground },
+		backgroundColor: 'transparent',
+		color: colors.foreground,
 	},
 	link: {
 		backgroundColor: 'transparent',
 		color: colors.primary,
-		textDecorationLine: { ':hover': 'underline', default: 'none' },
+		textDecorationLine: 'none',
 		textUnderlineOffset: '4px',
 	},
 	outline: {
-		backgroundColor: {
-			':hover': colors.accent,
-			default: colors.background,
-		},
+		backgroundColor: colors.background,
 		borderColor: colors.border,
 		borderWidth: '1px',
 		boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-		color: { ':hover': colors.accentForeground, default: colors.foreground },
+		color: colors.foreground,
 	},
 	secondary: {
-		backgroundColor: {
-			':hover': `color-mix(in oklab, ${colors.secondary} 80%, transparent)`,
-			default: colors.secondary,
-		},
+		backgroundColor: colors.secondary,
 		boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
 		color: colors.secondaryForeground,
 	},
