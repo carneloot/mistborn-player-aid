@@ -23,7 +23,7 @@ export type UndoState = Session | null;
 export const undoAtom = Atom.make<UndoState[]>([]);
 
 export const randomizeSetupAtom = Atom.fn((_, get) =>
-	Effect.fn('randomizeSetup')(function* (): Effect.fn.Return<Session | null> {
+	Effect.gen(function* () {
 		const session = get(sessionAtom);
 		if (session === null || session.setupComplete) return session;
 		const [players, assignedCharacters, selectedMissions] = yield* Effect.all(
@@ -43,5 +43,5 @@ export const randomizeSetupAtom = Atom.fn((_, get) =>
 		});
 		get.set(sessionAtom, randomized);
 		return randomized;
-	})(),
+	}).pipe(Effect.withSpan('randomizeSetup')),
 );

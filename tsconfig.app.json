@@ -19,7 +19,8 @@
 		"verbatimModuleSyntax": true,
 		"jsx": "react-jsx",
 		"isolatedModules": true,
-		"noEmit": true
+		"noEmit": true,
+		"plugins": [{ "name": "@effect/language-service" }]
 	},
 	"include": ["src"]
 }

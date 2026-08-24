@@ -6,7 +6,8 @@
 	"scripts": {
 		"dev": "vite",
 		"dev:cloudflare": "alchemy dev",
-		"build": "vite build && tsc -b",
+		"build": "vite build && bun run typecheck",
+		"typecheck": "effect-tsgo patch && tsc -b",
 		"deploy": "alchemy deploy",
 		"destroy": "alchemy destroy",
 		"preview": "vite preview",
@@ -33,6 +34,7 @@
 	},
 	"devDependencies": {
 		"@effect/platform-bun": "^4.0.0-rc.111",
+		"@effect/tsgo": "0.36.5",
 		"@stylexjs/unplugin": "0.19.0",
 		"@tanstack/router-plugin": "^1.168.35",
 		"@testing-library/jest-dom": "6.9.1",

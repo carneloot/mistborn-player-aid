@@ -9,13 +9,13 @@ const PlayerSchema = Schema.Struct({
 	color: Schema.Literals(playerColors),
 	symbol: Schema.String,
 	character: Schema.NullOr(Schema.String),
-	boxings: Schema.Number,
+	boxings: Schema.Finite,
 });
 
 const ScratchpadSchema = Schema.Struct({
-	coins: Schema.Number,
-	combat: Schema.Number,
-	missionPoints: Schema.Number,
+	coins: Schema.Finite,
+	combat: Schema.Finite,
+	missionPoints: Schema.Finite,
 	lastPayment: Schema.NullOr(Schema.String),
 });
 
@@ -25,8 +25,8 @@ export const SessionSchema = Schema.Struct({
 	players: Schema.Array(PlayerSchema),
 	firstPlayerId: Schema.NullOr(Schema.String),
 	activePlayerId: Schema.NullOr(Schema.String),
-	round: Schema.Number,
-	completedTurns: Schema.Number,
+	round: Schema.Finite,
+	completedTurns: Schema.Finite,
 	missions: Schema.Array(Schema.String),
 	scratchpad: ScratchpadSchema,
 });
