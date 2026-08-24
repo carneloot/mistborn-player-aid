@@ -3,6 +3,8 @@ import { createRootRoute, Outlet } from '@tanstack/react-router';
 import { MonitorIcon, MoonIcon, SunIcon } from 'lucide-react';
 import { createContext, useContext, useEffect, useState } from 'react';
 
+import { Button } from '@/components/ui/button';
+
 import { styles } from '../app.styles';
 import { lightTheme } from '../lib/tokens.stylex';
 
@@ -50,15 +52,15 @@ export function ThemeToggle() {
 				? MoonIcon
 				: MonitorIcon;
 	return (
-		<button
-			{...stylex.props(styles.themeToggle)}
+		<Button
+			className={stylex.props(styles.themeToggle).className}
 			aria-label={`Theme: ${context.theme}. Switch to ${nextTheme[context.theme]}.`}
 			onClick={context.cycleTheme}
-			type="button"
+			variant="ghost"
 		>
 			<Icon aria-hidden="true" {...stylex.props(styles.themeToggleIcon)} />
 			{context.theme}
-		</button>
+		</Button>
 	);
 }
 

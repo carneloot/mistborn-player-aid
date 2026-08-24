@@ -3,6 +3,7 @@
 import { useRender } from '@base-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import type { StyleXStyles } from '@stylexjs/stylex';
+import { useRef } from 'react';
 
 import { customClassName } from '@/lib/utils.stylex';
 
@@ -122,9 +123,15 @@ const Button = ({
 	size = 'default',
 	render,
 	type = 'button',
+	onClick,
+	onPointerCancel,
+	onPointerDown,
+	onPointerUp,
 	...props
-}: ButtonProps) =>
-	useRender({
+}: ButtonProps) => {
+	const handledTouch = useRef(false);
+	const dispatchingTouchClick = useRef(false);
+	return useRender({
 		props: {
 			...stylex.props(
 				styles.base,
@@ -138,9 +145,41 @@ const Button = ({
 			'data-slot': 'button',
 			'data-variant': variant,
 			type,
+			onClick: (event: React.MouseEvent<HTMLButtonElement>) => {
+				if (dispatchingTouchClick.current) {
+					onClick?.(event);
+					return;
+				}
+				if (handledTouch.current && event.detail !== 0) {
+					handledTouch.current = false;
+					event.preventDefault();
+					event.stopPropagation();
+					return;
+				}
+				handledTouch.current = false;
+				onClick?.(event);
+			},
+			onPointerCancel: (event: React.PointerEvent<HTMLButtonElement>) => {
+				handledTouch.current = false;
+				onPointerCancel?.(event);
+			},
+			onPointerDown: (event: React.PointerEvent<HTMLButtonElement>) => {
+				onPointerDown?.(event);
+				if (!event.defaultPrevented && event.pointerType !== 'touch')
+					handledTouch.current = false;
+			},
+			onPointerUp: (event: React.PointerEvent<HTMLButtonElement>) => {
+				onPointerUp?.(event);
+				if (event.defaultPrevented || event.pointerType !== 'touch') return;
+				handledTouch.current = true;
+				dispatchingTouchClick.current = true;
+				event.currentTarget.click();
+				dispatchingTouchClick.current = false;
+			},
 			...props,
 		},
 		render: render ?? <button />,
 	});
+};
 
 export { Button, styles as buttonStyles };
