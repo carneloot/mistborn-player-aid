@@ -15,8 +15,7 @@ import { useSession } from '../hooks/use-session';
 import { ThemeToggle } from './__root';
 
 function PlayPage() {
-	const { session, change, undoLast, canUndo, setSession, setUndo } =
-		useSession();
+	const { session, change, setSession, setUndo } = useSession();
 	const navigate = useNavigate();
 	const [purchaseCost, setPurchaseCost] = useState(1);
 	const [confirmingEnd, setConfirmingEnd] = useState(false);
@@ -138,9 +137,6 @@ function PlayPage() {
 				</div>
 				<div {...stylex.props(styles.turnControls)}>
 					<ThemeToggle />
-					<Button variant="ghost" disabled={!canUndo} onClick={undoLast}>
-						Undo
-					</Button>
 					<Button
 						className={stylex.props(styles.turnButton).className}
 						variant="outline"
