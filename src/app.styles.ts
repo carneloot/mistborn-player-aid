@@ -10,10 +10,12 @@ export const styles = stylex.create({
 		color: colors.foreground,
 		fontFamily: 'Avenir Next, Avenir, ui-sans-serif, system-ui, sans-serif',
 		fontSynthesis: 'none',
-		inset: 0,
+		height: 'var(--app-viewport-height, 100dvh)',
+		insetInline: 0,
 		minWidth: '320px',
-		overflow: 'auto',
+		overflowY: 'auto',
 		position: 'fixed',
+		top: 0,
 	},
 	app: { boxSizing: 'border-box', minHeight: '100%', width: '100%' },
 	heading: {
@@ -105,6 +107,12 @@ export const styles = stylex.create({
 		gap: '0.4rem',
 		marginBottom: '1rem',
 	},
+	setupSubmit: {
+		bottom: 'max(0.75rem, env(safe-area-inset-bottom))',
+		position: { default: 'static', [mobile]: 'sticky' },
+		zIndex: 1,
+	},
+	setupForm: { display: 'grid' },
 	setupGrid: {
 		display: 'grid',
 		gap: '1rem',

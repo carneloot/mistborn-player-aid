@@ -66,6 +66,18 @@ function RootLayout() {
 	const [theme, setTheme] = useState<Theme>(initialTheme);
 	const [resolvedTheme, setResolvedTheme] = useState(() => resolveTheme(theme));
 	useEffect(() => {
+		const viewport = window.visualViewport;
+		if (!viewport) return;
+		const updateViewportHeight = () =>
+			document.documentElement.style.setProperty(
+				'--app-viewport-height',
+				`${viewport.height}px`,
+			);
+		updateViewportHeight();
+		viewport.addEventListener('resize', updateViewportHeight);
+		return () => viewport.removeEventListener('resize', updateViewportHeight);
+	}, []);
+	useEffect(() => {
 		localStorage.setItem(themeStorageKey, theme);
 		const media = window.matchMedia('(prefers-color-scheme: dark)');
 		const updateResolvedTheme = () => setResolvedTheme(resolveTheme(theme));

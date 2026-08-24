@@ -83,43 +83,56 @@ function SetupPage() {
 					</h1>
 				</header>
 				<Card className={stylex.props(styles.appCard).className}>
-					<label {...stylex.props(styles.fieldLabel)}>
-						Players
-						<NativeSelect
-							value={count}
-							onChange={(event) => {
-								const next = Number(event.target.value);
-								setCount(next);
-								setNames((current) =>
-									Array.from(
-										{ length: next },
-										(_, index) => current[index] ?? `Player ${index + 1}`,
-									),
-								);
-							}}
-						>
-							<NativeSelectOption value={2}>2</NativeSelectOption>
-							<NativeSelectOption value={3}>3</NativeSelectOption>
-							<NativeSelectOption value={4}>4</NativeSelectOption>
-						</NativeSelect>
-					</label>
-					{Array.from({ length: count }, (_, index) => (
-						<label key={index} {...stylex.props(styles.fieldLabel)}>
-							Player {index + 1}
-							<Input
-								value={names[index] ?? ''}
-								maxLength={20}
-								onChange={(event) =>
+					<form
+						{...stylex.props(styles.setupForm)}
+						onSubmit={(event) => {
+							event.preventDefault();
+							initialize();
+						}}
+					>
+						<label {...stylex.props(styles.fieldLabel)}>
+							Players
+							<NativeSelect
+								value={count}
+								onChange={(event) => {
+									const next = Number(event.target.value);
+									setCount(next);
 									setNames((current) =>
-										current.map((name, nameIndex) =>
-											nameIndex === index ? event.target.value : name,
+										Array.from(
+											{ length: next },
+											(_, index) => current[index] ?? `Player ${index + 1}`,
 										),
-									)
-								}
-							/>
+									);
+								}}
+							>
+								<NativeSelectOption value={2}>2</NativeSelectOption>
+								<NativeSelectOption value={3}>3</NativeSelectOption>
+								<NativeSelectOption value={4}>4</NativeSelectOption>
+							</NativeSelect>
 						</label>
-					))}
-					<Button onClick={initialize}>Continue to randomizers</Button>
+						{Array.from({ length: count }, (_, index) => (
+							<label key={index} {...stylex.props(styles.fieldLabel)}>
+								Player {index + 1}
+								<Input
+									value={names[index] ?? ''}
+									maxLength={20}
+									onChange={(event) =>
+										setNames((current) =>
+											current.map((name, nameIndex) =>
+												nameIndex === index ? event.target.value : name,
+											),
+										)
+									}
+								/>
+							</label>
+						))}
+						<Button
+							className={stylex.props(styles.setupSubmit).className}
+							type="submit"
+						>
+							Continue to randomizers
+						</Button>
+					</form>
 				</Card>
 			</main>
 		);

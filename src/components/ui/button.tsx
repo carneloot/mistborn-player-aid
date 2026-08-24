@@ -119,6 +119,7 @@ const Button = ({
 	variant = 'default',
 	size = 'default',
 	render,
+	type = 'button',
 	...props
 }: ButtonProps) =>
 	useRender({
@@ -134,9 +135,10 @@ const Button = ({
 			'data-size': size,
 			'data-slot': 'button',
 			'data-variant': variant,
+			type,
 			...props,
 		},
-		render: render ?? <button type="button" />,
+		render: render ?? <button />,
 	});
 
 export { Button, styles as buttonStyles };
