@@ -18,7 +18,7 @@ import { CSS } from '@dnd-kit/utilities';
 import * as stylex from '@stylexjs/stylex';
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { GripVerticalIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -81,6 +81,9 @@ function SortablePlayer({
 function SetupPage() {
 	const { session, setSession, setUndo, randomizeSetup, change } = useSession();
 	const navigate = useNavigate();
+	useEffect(() => {
+		if (session?.setupComplete) void navigate({ to: '/play' });
+	}, [navigate, session?.setupComplete]);
 	const [count, setCount] = useState(session?.players.length ?? 2);
 	const [players, setPlayers] = useState<PlayerDraft[]>(
 		() =>
@@ -131,12 +134,12 @@ function SetupPage() {
 	const confirm = () => {
 		if (!draft || !isSetupReady(draft)) return;
 		change(completeSetup);
-		navigate({ to: '/play' });
 	};
 	const returnToPlayerSetup = () => {
 		setSession(null);
 		setUndo([]);
 	};
+	if (session?.setupComplete) return null;
 	if (!draft)
 		return (
 			<main {...stylex.props(styles.app, styles.setup)}>
