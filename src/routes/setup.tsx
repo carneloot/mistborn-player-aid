@@ -146,7 +146,7 @@ function SetupPage() {
 				<header {...stylex.props(styles.setupHeader)}>
 					<div {...stylex.props(styles.setupUtility)}>
 						<Link to="/" {...stylex.props(styles.link)}>
-							Mistborn Player Aid
+							Mistborn Companion App
 						</Link>
 						<ThemeToggle />
 					</div>
@@ -240,7 +240,7 @@ function SetupPage() {
 			<header {...stylex.props(styles.setupHeader)}>
 				<div {...stylex.props(styles.setupUtility)}>
 					<Link to="/" {...stylex.props(styles.link)}>
-						Mistborn Player Aid
+						Mistborn Companion App
 					</Link>
 					<ThemeToggle />
 				</div>

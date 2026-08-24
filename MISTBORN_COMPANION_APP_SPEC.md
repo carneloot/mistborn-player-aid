@@ -1,4 +1,4 @@
-# Mistborn Player Aid — MVP Specification
+# Mistborn Companion App — MVP specification
 
 ## Purpose
 

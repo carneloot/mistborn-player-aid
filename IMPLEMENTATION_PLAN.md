@@ -1,4 +1,4 @@
-# Mistborn Player Aid MVP — Implementation Plan
+# Mistborn Companion App MVP — Implementation Plan
 
 ## Architecture decisions
 

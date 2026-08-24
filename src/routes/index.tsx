@@ -24,7 +24,7 @@ function LaunchPage() {
 			<h1 {...stylex.props(styles.heading)}>
 				Mistborn
 				<br />
-				Player Aid
+				Companion App
 			</h1>
 			<p {...stylex.props(styles.lede)}>
 				A shared iPad aid for competitive play. Physical components always
